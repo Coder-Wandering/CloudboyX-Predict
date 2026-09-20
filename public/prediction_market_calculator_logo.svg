@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 88" width="380" height="88" fill="none">
+  <defs>
+    <!-- Background Badge Gradient - 5-Color System Ocean/Navy from Screenshot -->
+    <linearGradient id="fintechBadgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#03045e" />
+      <stop offset="60%" stop-color="#0077b6" />
+      <stop offset="100%" stop-color="#00b4d8" />
+    </linearGradient>
+
+    <!-- Probability Wave Gradient -->
+    <linearGradient id="probWaveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#caf0f8" stop-opacity="0.6" />
+      <stop offset="50%" stop-color="#90e0ef" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="1.0" />
+    </linearGradient>
+
+    <!-- Curve Fill Gradient -->
+    <linearGradient id="curveFillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00b4d8" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#03045e" stop-opacity="0.0" />
+    </linearGradient>
+
+    <!-- Accent Glow Filter -->
+    <filter id="glowFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#00b4d8" flood-opacity="0.5" />
+    </filter>
+
+    <!-- Badge Drop Shadow -->
+    <filter id="badgeShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#03045e" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- ==================== ICON EMBLEM (LEFT) ==================== -->
+  <g transform="translate(4, 4)" filter="url(#badgeShadow)">
+    <!-- Squircle Container -->
+    <rect x="0" y="0" width="80" height="80" rx="18" fill="url(#fintechBadgeGrad)" />
+    
+    <!-- Subtle Inner Border -->
+    <rect x="0.75" y="0.75" width="78.5" height="78.5" rx="17.25" stroke="#90e0ef" stroke-width="1.2" stroke-opacity="0.5" />
+
+    <!-- Grid lines / Coordinate ticks -->
+    <line x1="14" y1="56" x2="66" y2="56" stroke="#90e0ef" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.3" />
+    <line x1="14" y1="40" x2="66" y2="40" stroke="#90e0ef" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.25" />
+    <line x1="40" y1="20" x2="40" y2="60" stroke="#90e0ef" stroke-width="1" stroke-dasharray="2 2" stroke-opacity="0.3" />
+
+    <!-- Gaussian Area Fill -->
+    <path
+      d="M 16 56 
+         C 26 56, 30 50, 35 34 
+         C 38 24, 42 24, 45 34 
+         C 50 50, 54 56, 64 56 
+         Z"
+      fill="url(#curveFillGrad)"
+    />
+
+    <!-- Gaussian Probability Density Bell Curve Line -->
+    <path
+      d="M 16 56 
+         C 26 56, 30 50, 35 34 
+         C 38 24, 42 24, 45 34 
+         C 50 50, 54 56, 64 56"
+      fill="none"
+      stroke="url(#probWaveGrad)"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- Forecast Trend Vector Line (Upward Alpha Edge) -->
+    <path
+      d="M 22 48 L 38 36 L 48 42 L 62 23"
+      fill="none"
+      stroke="#caf0f8"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- Arrowhead at apex -->
+    <path
+      d="M 57 23 L 62 23 L 62 28"
+      fill="none"
+      stroke="#caf0f8"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- Calibrated Odds Apex Node (Alpha Point) -->
+    <circle cx="40" cy="27" r="3.5" fill="#00b4d8" filter="url(#glowFilter)" />
+    <circle cx="40" cy="27" r="1.5" fill="#FFFFFF" />
+
+    <!-- Sub Nodes -->
+    <circle cx="22" cy="48" r="2" fill="#90e0ef" />
+    <circle cx="48" cy="42" r="2" fill="#caf0f8" />
+    <circle cx="62" cy="23" r="2.5" fill="#ffffff" />
+  </g>
+
+  <!-- ==================== FINTECH TYPOGRAPHY LOCKUP (VERTICALLY CENTERED) ==================== -->
+  <g transform="translate(102, 0)">
+    <!-- Primary Title: CloudboyX Predict -->
+    <text
+      x="0"
+      y="51"
+      font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+      font-size="28"
+      font-weight="900"
+      letter-spacing="-0.02em"
+      fill="#03045e"
+    >
+      Cloudboy<tspan fill="#00b4d8" font-weight="900">X</tspan> <tspan font-weight="800" fill="#03045e">Predict</tspan>
+    </text>
+
+    <!-- Edge Calc Pill Badge -->
+    <g transform="translate(244, 35)">
+      <rect x="0" y="0" width="80" height="20" rx="6" fill="#caf0f8" stroke="#90e0ef" stroke-width="1" />
+      <circle cx="10" cy="10" r="2.5" fill="#00b4d8" />
+      <text
+        x="18"
+        y="13.5"
+        font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+        font-size="9.5"
+        font-weight="800"
+        letter-spacing="0.08em"
+        fill="#03045e"
+      >
+        EDGE CALC
+      </text>
+    </g>
+  </g>
+</svg>

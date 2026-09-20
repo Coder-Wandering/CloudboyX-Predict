@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 250" width="100%" height="100%" fill="none">
+  <!-- Mountain-Cloud Infinity Emblem from cbffinal.png -->
+  <g stroke="#03045e" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Mountain Loop (Left Side) -->
+    <path d="M 68 200 
+             L 172 32 
+             L 242 138" />
+
+    <path d="M 68 200 
+             C 54 200, 48 185, 56 172
+             L 172 32" />
+
+    <!-- Mountain Inner Ridge / 'F' Facet -->
+    <path d="M 172 32 
+             L 142 85 
+             L 165 92" />
+    <path d="M 142 85 
+             L 124 122 
+             L 148 128" />
+
+    <!-- Infinity Center Crossing into Cloud Loop (Right Side) -->
+    <path d="M 235 130 
+             C 245 105, 265 80, 298 75
+             C 328 70, 355 88, 362 105
+             C 382 72, 435 68, 460 102
+             C 485 135, 475 180, 452 200
+             C 420 228, 350 228, 295 210
+             C 260 198, 240 170, 222 142
+             C 200 108, 140 200, 68 200" />
+             
+    <!-- Lower crossover bridge -->
+    <path d="M 242 138 
+             C 255 160, 275 185, 305 200" />
+  </g>
+</svg>

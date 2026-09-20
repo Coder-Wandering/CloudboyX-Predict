@@ -1,0 +1,5 @@
+timestamp,event_query,news_sentiment,macro_momentum,volatility_vix,yield_10y,market_implied_prior,outcome_label
+2026-09-08T05:18:49.596681,Will the Federal Reserve cut interest rates at the next FOMC?,-0.125,0.0,15.3,4.78,54.0,
+2026-09-08T05:19:26.019599,Will the Federal Reserve cut interest rates at the next FOMC?,-0.125,0.0,15.3,4.78,54.0,
+2026-09-08T05:28:04.348126,Will the Federal Reserve cut interest rates at the next FOMC meeting?,-0.25,0.0,15.3,4.78,54.0,
+2026-09-08T05:53:22.394162,Will OpenAI or Anthropic IPO first?,0.0,0.0,15.3,4.78,9.0,

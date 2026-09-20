@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 320" width="100%" height="100%" fill="none">
+  <defs>
+    <!-- Gradient for the signature 'X' - Cyan to Royal Blue to Indigo/Purple -->
+    <linearGradient id="cbxGradWhite" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d4ff" />
+      <stop offset="40%" stop-color="#0077b6" />
+      <stop offset="75%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+
+    <!-- Subtle drop shadow for depth -->
+    <filter id="cbxShadowWhite" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- ==================== MOUNTAIN-CLOUD INFINITY EMBLEM ==================== -->
+  <g id="cbx-infinity-emblem-white" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#cbxShadowWhite)">
+    <!-- Mountain Loop (Left Side) -->
+    <path d="M 68 200 
+             L 172 32 
+             L 242 138" />
+
+    <path d="M 68 200 
+             C 54 200, 48 185, 56 172
+             L 172 32" />
+
+    <!-- Mountain Inner Ridge / 'F' Facet -->
+    <path d="M 172 32 
+             L 142 85 
+             L 165 92" />
+    <path d="M 142 85 
+             L 124 122 
+             L 148 128" />
+
+    <!-- Infinity Center Crossing into Cloud Loop (Right Side) -->
+    <path d="M 235 130 
+             C 245 105, 265 80, 298 75
+             C 328 70, 355 88, 362 105
+             C 382 72, 435 68, 460 102
+             C 485 135, 475 180, 452 200
+             C 420 228, 350 228, 295 210
+             C 260 198, 240 170, 222 142
+             C 200 108, 140 200, 68 200" />
+             
+    <!-- Lower crossover bridge -->
+    <path d="M 242 138 
+             C 255 160, 275 185, 305 200" />
+  </g>
+
+  <!-- ==================== CLOUDBOYX TYPOGRAPHY ==================== -->
+  <!-- "Cloudboy" in crisp white outline/fill -->
+  <g id="cbx-typography-white" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" filter="url(#cbxShadowWhite)">
+    <text x="18" y="295" font-size="76" font-weight="800" letter-spacing="-0.03em" fill="#ffffff">
+      Cloudboy
+    </text>
+
+    <!-- Bold Gradient 'X' -->
+    <text x="396" y="295" font-size="82" font-weight="900" letter-spacing="-0.02em" fill="url(#cbxGradWhite)">
+      X
+    </text>
+  </g>
+</svg>

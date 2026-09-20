@@ -1,0 +1,237 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-cb-navy: #03045e;
+  --color-cb-ocean: #0077b6;
+  --color-cb-cyan: #00b4d8;
+  --color-cb-ice: #90e0ef;
+  --color-cb-frost: #caf0f8;
+
+  --color-palette-1: #03045e;
+  --color-palette-2: #0077b6;
+  --color-palette-3: #00b4d8;
+  --color-palette-4: #90e0ef;
+  --color-palette-5: #caf0f8;
+
+  --animate-fade-in-up: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-up: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-toast-shrink: toast-shrink linear forwards;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 24px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 24px);
+  }
+  100% {
+    transform: translate(-50%, 0);
+  }
+}
+
+:root {
+  --cb-navy: #03045e;
+  --cb-ocean: #0077b6;
+  --cb-cyan: #00b4d8;
+  --cb-ice: #90e0ef;
+  --cb-frost: #caf0f8;
+}
+
+/* Dark theme root settings */
+html.dark {
+  color-scheme: dark;
+  background-color: #080d1a;
+  color: #f1f5f9;
+}
+
+/* Comprehensive Dark Mode Surface & Text Overrides */
+html.dark body {
+  background-color: #080d1a;
+  color: #f1f5f9;
+}
+
+/* Header & Card Surfaces */
+html.dark #main-app-header {
+  background-color: rgba(11, 17, 32, 0.95);
+  border-color: #1e293b;
+}
+
+html.dark .bg-white {
+  background-color: #0f172a;
+  color: #f1f5f9;
+}
+
+html.dark .bg-white\/95,
+html.dark .bg-white\/92,
+html.dark .bg-white\/90,
+html.dark .bg-white\/85,
+html.dark .bg-white\/80 {
+  background-color: rgba(15, 23, 42, 0.94);
+}
+
+html.dark #header-brand-lockup span.text-\[\#03045e\] {
+  color: #ffffff;
+}
+
+html.dark #header-brand-lockup span.text-\[\#0077b6\] {
+  color: #38bdf8;
+}
+
+html.dark #universal-hamburger-menu-btn {
+  color: #90e0ef;
+}
+
+html.dark #universal-hamburger-menu-btn:hover {
+  color: #ffffff;
+  background-color: rgba(14, 116, 144, 0.25);
+}
+
+html.dark .bg-stone-50,
+html.dark .bg-stone-50\/70,
+html.dark .bg-stone-50\/50 {
+  background-color: #151f32;
+}
+
+html.dark .bg-stone-100,
+html.dark .bg-stone-100\/70,
+html.dark .bg-stone-100\/80,
+html.dark .bg-stone-100\/90 {
+  background-color: #1a253c;
+}
+
+html.dark .bg-stone-200,
+html.dark .bg-stone-200\/60 {
+  background-color: #24324a;
+}
+
+/* Borders */
+html.dark .border-stone-100 {
+  border-color: #1e293b;
+}
+
+html.dark .border-stone-200,
+html.dark .border-stone-200\/60,
+html.dark .border-stone-200\/70 {
+  border-color: #23334d;
+}
+
+html.dark .border-stone-300 {
+  border-color: #334563;
+}
+
+/* Typography contrast */
+html.dark .text-stone-900 {
+  color: #f8fafc;
+}
+
+html.dark .text-stone-800 {
+  color: #f1f5f9;
+}
+
+html.dark .text-stone-700 {
+  color: #e2e8f0;
+}
+
+html.dark .text-stone-600 {
+  color: #cbd5e1;
+}
+
+html.dark .text-stone-500 {
+  color: #94a3b8;
+}
+
+html.dark .text-stone-400 {
+  color: #64748b;
+}
+
+/* Navy text contrast elevation in dark mode */
+html.dark .text-\[\#03045e\] {
+  color: #90e0ef;
+}
+
+html.dark .bg-\[\#caf0f8\] {
+  background-color: #0d2847;
+  color: #90e0ef;
+}
+
+html.dark .bg-\[\#caf0f8\]\/50,
+html.dark .bg-\[\#caf0f8\]\/60,
+html.dark .bg-\[\#caf0f8\]\/70,
+html.dark .bg-\[\#caf0f8\]\/80 {
+  background-color: rgba(13, 40, 71, 0.7);
+}
+
+html.dark .border-\[\#90e0ef\] {
+  border-color: #1e4a7a;
+}
+
+/* Inputs & Form Controls */
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark textarea,
+html.dark select {
+  background-color: #151f32;
+  color: #f8fafc;
+  border-color: #2b3d5c;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b;
+}
+
+/* Unified Range Slider styling across all browsers */
+input[type="range"] {
+  accent-color: #0077b6;
+}
+
+/* Custom scrollbar matching palette */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f9fc;
+}
+::-webkit-scrollbar-thumb {
+  background: #90e0ef;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00b4d8;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #080d1a;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #1e2d44;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #0077b6;
+}
+
+@keyframes toast-shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+#export-toast-notification {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+

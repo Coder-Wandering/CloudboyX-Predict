@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Cloud Gradient -->
+    <linearGradient id="cbCloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5558EB" />
+      <stop offset="100%" stop-color="#3B42C4" />
+    </linearGradient>
+
+    <!-- Red Slash Gradient -->
+    <linearGradient id="cbRedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF385C" />
+      <stop offset="100%" stop-color="#DC2626" />
+    </linearGradient>
+
+    <!-- Drop Shadow for Slits -->
+    <filter id="cbShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.25" flood-color="#0F172A" />
+    </filter>
+  </defs>
+
+  <!-- CloudboyX Emblem Group -->
+  <g transform="translate(0, -15)">
+    <!-- Main Cloud Outline -->
+    <path
+      d="M 180 270 
+         C 140 270 130 235 150 205 
+         C 145 170 185 145 220 155 
+         C 245 125 305 125 330 160 
+         C 365 155 395 185 390 220 
+         C 415 240 405 270 375 270 
+         Z"
+      fill="none"
+      stroke="url(#cbCloudGrad)"
+      stroke-width="26"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- Left Bubble Highlight Cutout -->
+    <path
+      d="M 162 210 C 158 230 170 248 190 252"
+      fill="none"
+      stroke="url(#cbCloudGrad)"
+      stroke-width="12"
+      stroke-linecap="round"
+      opacity="0.9"
+    />
+
+    <!-- Stylized Red 'X' - Forward Dynamic Slash -->
+    <!-- Red Upper Accent -->
+    <polygon
+      points="340,165 300,225 320,225 360,165"
+      fill="url(#cbRedGrad)"
+      filter="url(#cbShadow)"
+    />
+    <!-- Red Lower Main Thrust -->
+    <polygon
+      points="295,232 215,310 240,310 315,232"
+      fill="url(#cbRedGrad)"
+      filter="url(#cbShadow)"
+    />
+    <!-- Red Parallel Speed Line -->
+    <polygon
+      points="280,260 250,305 260,305 290,260"
+      fill="url(#cbRedGrad)"
+      opacity="0.85"
+    />
+
+    <!-- Stylized White Cross Slash (The other arm of the 'X') -->
+    <polygon
+      points="245,175 355,295 380,295 270,175"
+      fill="#FFFFFF"
+      stroke="#E2E8F0"
+      stroke-width="2"
+      filter="url(#cbShadow)"
+    />
+    <!-- White Inner Notch Line -->
+    <line
+      x1="270"
+      y1="200"
+      x2="350"
+      y2="285"
+      stroke="#CBD5E1"
+      stroke-width="3"
+      stroke-linecap="round"
+    />
+  </g>
+</svg>

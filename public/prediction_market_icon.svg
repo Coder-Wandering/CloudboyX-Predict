@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" fill="none">
+  <defs>
+    <!-- Background Pill/Squircle - Deep Navy from 5-color palette -->
+    <linearGradient id="cbfBadgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#03045e" />
+      <stop offset="60%" stop-color="#0077b6" />
+      <stop offset="100%" stop-color="#00b4d8" />
+    </linearGradient>
+
+    <!-- Gradient for X in emblem -->
+    <linearGradient id="cbfXGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00d4ff" />
+      <stop offset="50%" stop-color="#0077b6" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+
+    <!-- Subtle drop shadow for depth -->
+    <filter id="cbfIconShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Squircle container -->
+  <rect x="4" y="4" width="92" height="92" rx="22" fill="url(#cbfBadgeGrad)" />
+  <rect x="4.75" y="4.75" width="90.5" height="90.5" rx="21.25" stroke="#90e0ef" stroke-width="1.5" stroke-opacity="0.6" />
+
+  <!-- Mountain-Cloud Infinity Emblem from cbffinal.png in crisp white -->
+  <g transform="translate(10, 20) scale(0.16)" stroke="#ffffff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" fill="none" filter="url(#cbfIconShadow)">
+    <!-- Mountain Peak (Left side of infinity) -->
+    <path d="M 68 200 
+             L 172 32 
+             L 242 138" />
+
+    <path d="M 68 200 
+             C 54 200, 48 185, 56 172
+             L 172 32" />
+
+    <!-- Mountain Inner Ridge / 'F' Facet -->
+    <path d="M 172 32 
+             L 142 85 
+             L 165 92" />
+    <path d="M 142 85 
+             L 124 122 
+             L 148 128" />
+
+    <!-- Infinity Center Crossing into Cloud Loop (Right side) -->
+    <path d="M 235 130 
+             C 245 105, 265 80, 298 75
+             C 328 70, 355 88, 362 105
+             C 382 72, 435 68, 460 102
+             C 485 135, 475 180, 452 200
+             C 420 228, 350 228, 295 210
+             C 260 198, 240 170, 222 142
+             C 200 108, 140 200, 68 200" />
+             
+    <!-- Lower crossover bridge -->
+    <path d="M 242 138 
+             C 255 160, 275 185, 305 200" />
+  </g>
+</svg>

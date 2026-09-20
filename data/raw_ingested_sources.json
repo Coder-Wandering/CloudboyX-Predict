@@ -1,0 +1,418 @@
+{
+  "query": "Will OpenAI or Anthropic IPO first?",
+  "timestamp": "2026-09-08T05:53:22.394162",
+  "financial_records": [
+    {
+      "symbol": "^GSPC",
+      "name": "S&P 500",
+      "price": 7718.6,
+      "previous_close": 7718.6,
+      "change_24h_percent": 0.0,
+      "volatility_index": 8.33,
+      "currency": "USD",
+      "timestamp": "2026-09-08T05:53:21.010059",
+      "status": "live_api"
+    },
+    {
+      "symbol": "^TNX",
+      "name": "CBOE Interest Rate 10 Year T No",
+      "price": 4.78,
+      "previous_close": 4.78,
+      "change_24h_percent": 0.0,
+      "volatility_index": 5.42,
+      "currency": "USD",
+      "timestamp": "2026-09-08T05:53:21.111680",
+      "status": "live_api"
+    },
+    {
+      "symbol": "^VIX",
+      "name": "CBOE Volatility Index",
+      "price": 15.3,
+      "previous_close": 15.3,
+      "change_24h_percent": 0.0,
+      "volatility_index": 74.35,
+      "currency": "USD",
+      "timestamp": "2026-09-08T05:53:21.235128",
+      "status": "live_api"
+    },
+    {
+      "symbol": "SPY",
+      "name": "State Street SPDR S&P 500 ETF T",
+      "price": 770.19,
+      "previous_close": 770.19,
+      "change_24h_percent": 0.0,
+      "volatility_index": 8.16,
+      "currency": "USD",
+      "timestamp": "2026-09-08T05:53:21.368016",
+      "status": "live_api"
+    }
+  ],
+  "news_records": [
+    {
+      "title": "Which Investors Will Get Rich From Anthropic\u2019s IPO? - The New York Times",
+      "source": "The New York Times",
+      "published_at": "Fri, 04 Sep 2026 07:00:00 GMT",
+      "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPWTR5VzNmN3BqcWFjdy1mVHBjNzVSYmxwN05WSTlZZ05qa1Joa1ZJalBmYlI3bHJOU3YyVXJ1eDdFR2lsNXFSNEdpbExjSFVtbnE1dEh0ejYwbDVhdEEySVczYTZtc1pEZEZaWlF5clZOTWppWXFNZHo1WGcteEd1YmhEdUVEUklKaXc?oc=5",
+      "sentiment_score": 0.0,
+      "sentiment_label": "Neutral"
+    },
+    {
+      "title": "'It may be a while': OpenAI carefully manages expectations with its much-anticipated IPO announcement - Fast Company",
+      "source": "Fast Company",
+      "published_at": "Sun, 06 Sep 2026 18:57:51 GMT",
+      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxPSk9hWG5DWjY0enNCTlh4MWRoeEZSU1NZc0dVTFE3T20ydl9rWU5DUGNUSU83Sk1JMVVta3lIYzFYSGhxWFc1VXlKaFhQT2VCdDRjVXdXR0pSbkREVmR3WVpEQ2JmUE1xeHExWlJWQ1k5SEdndngzQ2l2UWRHMGY3MU5YM2ZtUEtaRlhjb3FFTlkzdGc?oc=5",
+      "sentiment_score": 0.0,
+      "sentiment_label": "Neutral"
+    },
+    {
+      "title": "Upcoming Anthropic and OpenAI IPOs could trigger early tax-loss selling - Investing.com Nigeria",
+      "source": "Investing.com Nigeria",
+      "published_at": "Mon, 07 Sep 2026 13:52:19 GMT",
+      "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxQWXJiak82c2JveFpCcnMxX3ZEZ2hLRjBmRkJ5TFZqaFQzNUxacV9ISGtobE55Yl9rQ29ULUZYLVYwckZYSFlCY0xtMm81R2s0N1EyMFVDQ0VDUUxIZ2QtUjU1S2NyYVRtbzlpMWNQckk1YV9UbDROY1ZwOTZYZDVHSWtVQmZ1dXA4SDBlWjNfbkhYcEt5WVhtemFLeTRRNWo3dFJoNHpLaXVmRDhoQzlhcTg2dl93T01pbURVNkYzMlZ3R1pm?oc=5",
+      "sentiment_score": 0.0,
+      "sentiment_label": "Neutral"
+    },
+    {
+      "title": "How The Anthropic And OpenAI IPOs Could Shake Up The AI Brawl - Investor's Business Daily",
+      "source": "Investor's Business Daily",
+      "published_at": "Fri, 28 Aug 2026 07:00:00 GMT",
+      "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNSVp1eHJqM0t1clZEdUMzeURaeko5TFpJR2hVdHV5TUo1VGs4b1JXRm50R1ZBUlN4U2pJQzFiYzZJLUhhcVEwTXFtS3hVb1pfa2RkX05Na3RGQnlhdzMtN2p0YUtqbDkweG1xRFh0U1VmeENZYW1zdnliZTcyNjdIMGlaZDBTb2tMSmQ1UmZ0cnI1LVA1?oc=5",
+      "sentiment_score": 0.0,
+      "sentiment_label": "Neutral"
+    },
+    {
+      "title": "OpenAI, Anthropic IPOs Could Spark a Selloff in These Struggling Stocks \u2014 IBM, Tesla, AppLovin Among Name - Benzinga",
+      "source": "Benzinga",
+      "published_at": "Mon, 07 Sep 2026 12:49:38 GMT",
+      "url": "https://news.google.com/rss/articles/CBMi-gFBVV95cUxPaU1UUVR6aHdtQldxcWVTaEM2cUdlaGVseWlBbVVwSUVhMzdDZVc2d3lXclZvTEhGWDZlTjAxRmRjQ2pwbmdIekhuUHBXN2xzTVdWRWpoVkNVTzFmbVZLZHo2bDhsMnpyZXNxc2sxUGMxdWVjUGlZa0JYRm41VHhaOGxVX3Q2NGY3MTdvQm9McklUQ2NSZmFBcUVRZnk3cXRkS3Fhd2xoVDVRa1BlWjNXWGdDT2RVOVpXSTdDbE1YVlZuU1poRlJidlpSV2ltQXhweFBBVmRBOFIxOXZXTmUxOERqWjdQWWRicmpONzZneWRjSFMtS1hpd0xn?oc=5",
+      "sentiment_score": 0.0,
+      "sentiment_label": "Neutral"
+    },
+    {
+      "title": "What a Delayed OpenAI IPO Would Tell Investors - Morningstar",
+      "source": "Morningstar",
+      "published_at": "Fri, 17 Jul 2026 07:00:00 GMT",
+      "url": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQeTVtTWh2dUR3Y0VnYlp6X0RPX01ZdldzRWZOS3JuVUk2OFRfaGl2VjVyaDFPcVlPbzlpYXhzNWt4UGdGQTBSNlg5aW11VDR1UzlROTZDTVZGMmZQazBqbE5UdC1KOGtXbTgwbEZBdE5sNXRXMExYNnU0NVBNOWxSbzZjc3l0UQ?oc=5",
+      "sentiment_score": 0.0,
+      "sentiment_label": "Neutral"
+    },
+    {
+      "title": "OpenAI Vs Anthropic IPO: How They Compare And What We Know | September 2026 - Forbes",
+      "source": "Forbes",
+      "published_at": "Thu, 09 Jul 2026 07:00:00 GMT",
+      "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOUUt4VEJ2TW1WeWZaUlNIYWR4OE1xVUhQY0NDeVppOWNwVGF0TEpQdGUtT3JGT1hrMFJlcWJ6ck5TbllTdERMb2ZQamstcnZFVkFjTkxkbGQwZmM5Zmg1bnNaMlRZeWI2aEhraVFhX3MzRkRWdXQ5MHNJd3EtTlc0SU5IYk5DSTJGSU9tdWJ3?oc=5",
+      "sentiment_score": 0.0,
+      "sentiment_label": "Neutral"
+    },
+    {
+      "title": "OpenAI 'will be a public company in 2027' or sooner, CFO Friar tells employees - CNBC",
+      "source": "CNBC",
+      "published_at": "Wed, 19 Aug 2026 07:00:00 GMT",
+      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTFBjVnJGYzVGcWt5c0F3WTY3elk5SkRrSUV3U3Y2OFdIV1dCRm4wVU5PZF8wV1VXT2Q4cVZZU3NZWlRFRTVhZTNYNTZNbEh2bmZ1aDJEWnFINFR6dlVqdGVsQ1RRSmhBV0dKYkFwcTZpQk56MGlZ0gF6QVVfeXFMTnhrRVAzUVl4M3FxY3gxcjdrZFhGODd4X2sxYzRpS1JTaHNJaXNxVEFuSExkOWlNVkYwZnJKX0xXV1hCOUxORnVjLWM1UEszb3BLa1gxMmZVa3dDQ2JNc3hyMERhMXFibThXczd5Y05BRFo5QlRONXdxQ3c?oc=5",
+      "sentiment_score": 0.0,
+      "sentiment_label": "Neutral"
+    }
+  ],
+  "kalshi_records": [
+    {
+      "event_ticker": "KXELONMARS-99",
+      "market_ticker": "KXELONMARS-99",
+      "title": "Will Elon Musk visit Mars in his lifetime?",
+      "category": "World",
+      "price_cents": 12,
+      "yes_bid": 10,
+      "yes_ask": 12,
+      "volume": 118572,
+      "open_interest": 40175,
+      "rules_primary": "If Elon Musk visits Mars before the earlier of his death or Aug 1, 2099, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXNEXTNATOSECGEN-99",
+      "market_ticker": "KXNEXTNATOSECGEN-99-KIOH",
+      "title": "Who will be the next Secretary General of NATO?",
+      "category": "Elections",
+      "price_cents": 29,
+      "yes_bid": 7,
+      "yes_ask": 12,
+      "volume": 296,
+      "open_interest": 97,
+      "rules_primary": "If Klaus Iohannis formally holds the position of Secretary General of NATO, and is the first such subject to do so after Issuance, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXNEWPOPE-70",
+      "market_ticker": "KXNEWPOPE-70-PPIZ",
+      "title": "Who will the next Pope be?",
+      "category": "Elections",
+      "price_cents": 3,
+      "yes_bid": 3,
+      "yes_ask": 4,
+      "volume": 19600,
+      "open_interest": 2946,
+      "rules_primary": "If Pierbattista Pizzaballa becomes the first person elected Pope before Jan 1, 2070, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXWARMING-50",
+      "market_ticker": "KXWARMING-50",
+      "title": "Will the world pass 2 degrees Celsius over pre-industrial levels before 2050?",
+      "category": "Climate and Weather",
+      "price_cents": 73,
+      "yes_bid": 73,
+      "yes_ask": 77,
+      "volume": 16991,
+      "open_interest": 5222,
+      "rules_primary": "If the annual global mean surface temperature anomaly has reached or exceeded +2.0\u00b0C above pre-industrial levels (1850-1900 average) in any calendar year before Jan 1, 2050, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXMARSVRAIL-50",
+      "market_ticker": "KXMARSVRAIL-50",
+      "title": "Will a human land on Mars before California starts high-speed rail?",
+      "category": "Science and Technology",
+      "price_cents": 34,
+      "yes_bid": 29,
+      "yes_ask": 34,
+      "volume": 15735,
+      "open_interest": 6653,
+      "rules_primary": "If a human lands on Mars before California starts its high speed rail service for the public before Jan 1, 2050, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXERUPTSUPER-0",
+      "market_ticker": "KXERUPTSUPER-0-50JAN01",
+      "title": "Will a supervolcano erupt before 2050?",
+      "category": "Climate and Weather",
+      "price_cents": 24,
+      "yes_bid": 22,
+      "yes_ask": 25,
+      "volume": 34756,
+      "open_interest": 11078,
+      "rules_primary": "If a supervolcano erupts before Jan 1, 2050, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXCOLONIZEMARS-50",
+      "market_ticker": "KXCOLONIZEMARS-50",
+      "title": "Will humans colonize Mars before 2050?",
+      "category": "Science and Technology",
+      "price_cents": 22,
+      "yes_bid": 18,
+      "yes_ask": 22,
+      "volume": 23920,
+      "open_interest": 9480,
+      "rules_primary": "If humans have a self-sufficient colony of at least 10 people reside on Mars for at least one Earth year before Jan 1, 2050, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXPERSONPRESMAM-45",
+      "market_ticker": "KXPERSONPRESMAM-45",
+      "title": "Will Zohran Mamdani become President of the United States before 2045?",
+      "category": "Elections",
+      "price_cents": 11,
+      "yes_bid": 8,
+      "yes_ask": 11,
+      "volume": 38924,
+      "open_interest": 17592,
+      "rules_primary": "If Zohran Mamdani becomes President of the United States before Jan 22, 2045, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXNEXTDNCCHAIR-45",
+      "market_ticker": "KXNEXTDNCCHAIR-45-BWIK",
+      "title": "Who will be the next DNC Chair?",
+      "category": "Politics",
+      "price_cents": 4,
+      "yes_bid": 0,
+      "yes_ask": 1,
+      "volume": 25,
+      "open_interest": 25,
+      "rules_primary": "If Ben Wikler formally holds Chair of the Democratic National Committee before Jan 1, 2045, and is the first such subject to do so after Issuance, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXXISUCCESSOR-45JAN01",
+      "market_ticker": "KXXISUCCESSOR-45JAN01-DXUE",
+      "title": "Who will be named as Xi Jinping's successor?",
+      "category": "Elections",
+      "price_cents": 28,
+      "yes_bid": 22,
+      "yes_ask": 28,
+      "volume": 4610,
+      "open_interest": 954,
+      "rules_primary": "If Ding Xuexiang is announced as the first new non-interim leader of the Chinese Communist Party (CCP) before Jan 1, 2045, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXPERSONPRESFUENTES-45",
+      "market_ticker": "KXPERSONPRESFUENTES-45",
+      "title": "Will Nick Fuentes become President of the United States before 2045?",
+      "category": "Elections",
+      "price_cents": 14,
+      "yes_bid": 13,
+      "yes_ask": 16,
+      "volume": 53629,
+      "open_interest": 16628,
+      "rules_primary": "If Nick Fuentes becomes President of the United States before Jan 1, 2045, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXNEXTROMANIAPM-45JAN01",
+      "market_ticker": "KXNEXTROMANIAPM-45JAN01-MISA",
+      "title": "Who will be the next new Prime Minister of Romania?",
+      "category": "Elections",
+      "price_cents": 1,
+      "yes_bid": 0,
+      "yes_ask": 4,
+      "volume": 483,
+      "open_interest": 249,
+      "rules_primary": "If the first new person to hold Prime Minister of Romania after Issuance is Mugur Is\u0103rescu, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXNEXTISRAELPM-45JAN01",
+      "market_ticker": "KXNEXTISRAELPM-45JAN01-NBEN",
+      "title": "Who will succeed Netanyahu as Prime Minister of Israel?",
+      "category": "Elections",
+      "price_cents": 14,
+      "yes_bid": 6,
+      "yes_ask": 10,
+      "volume": 38231,
+      "open_interest": 8633,
+      "rules_primary": "If the first new person to hold Prime Minister of Israel after Issuance is Naftali Bennett, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXG7LEADEROUT-26JUL20",
+      "market_ticker": "KXG7LEADEROUT-26JUL20-MCAR",
+      "title": "Which G7 leader will leave office next?",
+      "category": "Politics",
+      "price_cents": 3,
+      "yes_bid": 2,
+      "yes_ask": 3,
+      "volume": 601,
+      "open_interest": 503,
+      "rules_primary": "If the individual holding the title of Prime Minister of Canada at the time of Issuance is the first within G7 leaders to leave their position, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXWCCAREERGOALS-KMBAPPE",
+      "market_ticker": "KXWCCAREERGOALS-KMBAPPE-30",
+      "title": "Kylian Mbappe Total FIFA World Cup Career Goals",
+      "category": "Sports",
+      "price_cents": 83,
+      "yes_bid": 79,
+      "yes_ask": 83,
+      "volume": 688,
+      "open_interest": 231,
+      "rules_primary": "If Kylian Mbappe scores at least 30 goals in FIFA World Cup Tournament games during his career, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXNFLENDSTREAK-40NYJ",
+      "market_ticker": "KXNFLENDSTREAK-40NYJ-2627",
+      "title": "New York J: To Break Playoff Drought",
+      "category": "Sports",
+      "price_cents": 8,
+      "yes_bid": 6,
+      "yes_ask": 9,
+      "volume": 1769,
+      "open_interest": 1056,
+      "rules_primary": "If the New York J Pro Football team's next playoff appearance is in the 2026-27 Pro Football season, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXRAMPBREX-40",
+      "market_ticker": "KXRAMPBREX-40-RAMP",
+      "title": "Will Ramp or Brex IPO first?",
+      "category": "Financials",
+      "price_cents": 90,
+      "yes_bid": 90,
+      "yes_ask": 91,
+      "volume": 8455,
+      "open_interest": 2667,
+      "rules_primary": "If Ramp confirms an IPO first, before Jan 1, 2040, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXOAIANTH-40",
+      "market_ticker": "KXOAIANTH-40-OAI",
+      "title": "Will OpenAI or Anthropic IPO first?",
+      "category": "Financials",
+      "price_cents": 9,
+      "yes_bid": 9,
+      "yes_ask": 10,
+      "volume": 171652,
+      "open_interest": 41300,
+      "rules_primary": "If OpenAI confirms an IPO first, before Jan 1, 2040, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXFUSION",
+      "market_ticker": "KXFUSION-30-JAN01",
+      "title": "When will nuclear fusion be achieved?",
+      "category": "Science and Technology",
+      "price_cents": 30,
+      "yes_bid": 30,
+      "yes_ask": 33,
+      "volume": 30096,
+      "open_interest": 10815,
+      "rules_primary": "If nuclear fusion is achieved before Jan 1, 2030, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXDEELRIP-40",
+      "market_ticker": "KXDEELRIP-40-DEEL",
+      "title": "Will Deel or Rippling IPO first?",
+      "category": "Financials",
+      "price_cents": 67,
+      "yes_bid": 59,
+      "yes_ask": 66,
+      "volume": 5898,
+      "open_interest": 808,
+      "rules_primary": "If Deel confirms an IPO first, before Jan 1, 2040, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXGDPYEAR-36",
+      "market_ticker": "KXGDPYEAR-36-T0.1",
+      "title": "US real GDP growth in 2036?",
+      "category": "Economics",
+      "price_cents": 11,
+      "yes_bid": 9,
+      "yes_ask": 11,
+      "volume": 8711,
+      "open_interest": 430,
+      "rules_primary": "If the United States real GDP growth in 2036 is below 0.1%, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXUSCPIYEAR-37FEB01",
+      "market_ticker": "KXUSCPIYEAR-37FEB01-T0.0",
+      "title": "US headline CPI inflation in December 2036",
+      "category": "Economics",
+      "price_cents": 88,
+      "yes_bid": 78,
+      "yes_ask": 99,
+      "volume": 382,
+      "open_interest": 240,
+      "rules_primary": "If the 12-month percentage change in CPI-U, U.S. city average, all items, not seasonally adjusted, in December 2036 is above 0.0%, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXNOMGDPGROWTH-37JAN28",
+      "market_ticker": "KXNOMGDPGROWTH-37JAN28-T0.0",
+      "title": "US nominal GDP growth in 2036",
+      "category": "Economics",
+      "price_cents": 70,
+      "yes_bid": 90,
+      "yes_ask": 100,
+      "volume": 0,
+      "open_interest": 0,
+      "rules_primary": "If the annual percent change in U.S. current-dollar gross domestic product for calendar year 2036 is above 0.0%, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXU3EOY-37JAN09",
+      "market_ticker": "KXU3EOY-37JAN09-T3.0",
+      "title": "US unemployment rate at year-end 2036",
+      "category": "Economics",
+      "price_cents": 86,
+      "yes_bid": 85,
+      "yes_ask": 94,
+      "volume": 2,
+      "open_interest": 1,
+      "rules_primary": "If the seasonally adjusted U.S. unemployment rate (U-3) for December 2036 is above 3.0%, then the market resolves to Yes."
+    },
+    {
+      "event_ticker": "KXLFPRATEEOY-37JAN09",
+      "market_ticker": "KXLFPRATEEOY-37JAN09-T56.00",
+      "title": "US labor force participation rate at year-end 2036",
+      "category": "Economics",
+      "price_cents": 94,
+      "yes_bid": 92,
+      "yes_ask": 97,
+      "volume": 50,
+      "open_interest": 0,
+      "rules_primary": "If the U.S. labor force participation rate for December 2036 is above \n\n56.00%, then the market resolves to Yes."
+    }
+  ]
+}

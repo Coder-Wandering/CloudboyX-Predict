@@ -1,0 +1,13 @@
+{
+  "event_query": "Will OpenAI or Anthropic IPO first?",
+  "ingestion_timestamp": "2026-09-08T05:53:22.394162",
+  "features": {
+    "news_sentiment_score": 0.0,
+    "news_article_count": 8,
+    "macro_momentum_percent": 0.0,
+    "market_volatility_vix": 15.3,
+    "treasury_10y_yield": 4.78,
+    "market_implied_prior": 9.0,
+    "days_to_resolution": 14
+  }
+}
