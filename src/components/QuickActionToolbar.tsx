@@ -11,11 +11,13 @@ import {
   Share2,
   Database,
   Sparkles,
+  User,
 } from 'lucide-react';
+import { ActiveWorkspaceView } from '../types';
 
 export interface QuickActionToolbarProps {
-  activeView: 'model_studio' | 'market_analyzer' | 'erp_connector';
-  onSelectView: (view: 'model_studio' | 'market_analyzer' | 'erp_connector') => void;
+  activeView: ActiveWorkspaceView;
+  onSelectView: (view: ActiveWorkspaceView) => void;
   bankroll: number;
   openPositionsCount: number;
   onOpenPortfolio: () => void;
@@ -86,6 +88,22 @@ export const QuickActionToolbar: React.FC<QuickActionToolbarProps> = ({
             >
               <TrendingUp className="w-3.5 h-3.5" />
               <span>Contract Analyzer</span>
+            </button>
+
+            {/* NFL Predict Direct Button */}
+            <button
+              id="quick-action-player-props-btn"
+              onClick={() => onSelectView('player_props')}
+              className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                activeView === 'player_props'
+                  ? 'bg-[#03045e] text-white shadow-xs'
+                  : 'text-stone-700 hover:text-[#03045e] hover:bg-stone-100'
+              }`}
+              title="Switch directly to NFL Predict (Player props, matchups, score predictions & value edges)"
+              aria-current={activeView === 'player_props' ? 'page' : undefined}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>NFL Predict</span>
             </button>
 
             {/* CloudboyX Connect Direct Button */}

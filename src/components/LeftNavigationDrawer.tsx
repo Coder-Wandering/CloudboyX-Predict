@@ -20,16 +20,17 @@ import {
   LayoutGrid,
   LogOut,
   User,
+  Trophy,
 } from 'lucide-react';
-import { ProbabilityAnalysisResult } from '../types';
+import { ProbabilityAnalysisResult, ActiveWorkspaceView } from '../types';
 import { CloudboyXLogo } from './CloudboyXLogo';
 import { UserSession } from './AccessGateModal';
 
 interface LeftNavigationDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  activeView: 'model_studio' | 'market_analyzer' | 'erp_connector';
-  onSelectView: (view: 'model_studio' | 'market_analyzer' | 'erp_connector') => void;
+  activeView: ActiveWorkspaceView;
+  onSelectView: (view: ActiveWorkspaceView) => void;
   bankroll: number;
   openPositionsCount: number;
   onOpenPortfolio: () => void;
@@ -372,6 +373,42 @@ export const LeftNavigationDrawer: React.FC<LeftNavigationDrawerProps> = ({
                 <ChevronRight
                   className={`w-4 h-4 ${
                     activeView === 'market_analyzer' ? 'text-[#0077b6]' : 'text-stone-300'
+                  }`}
+                />
+              </button>
+
+              <button
+                id="drawer-nav-player-props-btn"
+                onClick={() => {
+                  onSelectView('player_props');
+                  onClose();
+                }}
+                className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-all cursor-pointer ${
+                  activeView === 'player_props'
+                    ? 'bg-[#caf0f8] text-[#03045e] font-bold border border-[#90e0ef] shadow-2xs'
+                    : 'text-stone-700 hover:bg-[#caf0f8]/30 hover:text-[#03045e] font-medium'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      activeView === 'player_props'
+                        ? 'bg-[#0077b6] text-white shadow-xs'
+                        : 'bg-stone-100 text-stone-500'
+                    }`}
+                  >
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="text-xs sm:text-sm font-bold">NFL Predict</div>
+                    <div className="text-[11px] text-stone-500 font-normal">
+                      Player props, matchups, points, predictions &amp; power ratings
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight
+                  className={`w-4 h-4 ${
+                    activeView === 'player_props' ? 'text-[#0077b6]' : 'text-stone-300'
                   }`}
                 />
               </button>

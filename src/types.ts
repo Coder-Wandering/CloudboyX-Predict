@@ -613,3 +613,256 @@ export interface BacktestExecutionResult {
   category: MarketCategory;
   timestamp: string;
 }
+
+export interface NflRecentActivityShift {
+  tag: 'HOT' | 'TRENDING';
+  headline: string;
+  shiftValue: string; // e.g., "+1.5 pt line shift (24h)" or "+4.2% prob surge"
+  volumeNote: string;
+  reason: string;
+  timestamp24h: string;
+  isHighActivity: boolean;
+}
+
+export type PropLineShiftDirection = 'up' | 'down' | 'stable';
+
+export interface NflPlayerProp {
+  id: string;
+  playerName: string;
+  team: string;
+  position: 'QB' | 'RB' | 'WR' | 'TE' | 'K';
+  opponent: string;
+  propType: 'Passing Yards' | 'Rushing Yards' | 'Receiving Yards' | 'Passing TDs' | 'Receptions' | 'Anytime TD';
+  consensusLine: number;
+  consensusOverOdds: string;
+  consensusUnderOdds: string;
+  openingLine?: number;
+  openingOverOdds?: string;
+  openingUnderOdds?: string;
+  lineMovement?: PropLineShiftDirection;
+  lineShiftDelta?: number;
+  modelProjection: number;
+  unit: string;
+  overProbabilityPercent: number;
+  underProbabilityPercent: number;
+  modelRecommendation: 'OVER' | 'UNDER' | 'NEUTRAL';
+  edgePercent: number;
+  matchupContext: string;
+  injuryStatus: 'Active' | 'Probable' | 'Questionable';
+  historicalLast5Average: number;
+  recentActivityShift?: NflRecentActivityShift;
+}
+
+export interface NflPlayerPropsResponse {
+  success: boolean;
+  matchup: string;
+  lastUpdated: string;
+  source: string;
+  props: NflPlayerProp[];
+}
+
+export type ActiveWorkspaceView = 'model_studio' | 'market_analyzer' | 'player_props' | 'erp_connector';
+
+export interface TrackedPlayerPropSlip {
+  id: string;
+  propId: string;
+  playerName: string;
+  team: string;
+  opponent: string;
+  position: string;
+  propType: string;
+  side: 'OVER' | 'UNDER';
+  line: number;
+  unit: string;
+  odds: string;
+  modelProjection: number;
+  edgePercent: number;
+  unitsWagered: number;
+  timestamp: string;
+  status: 'PENDING' | 'HIT' | 'MISS';
+}
+
+export interface NflGameTeam {
+  name: string;
+  city: string;
+  code: string;
+  record: string;
+  conference: string;
+  division: string;
+}
+
+export interface NflGameScheduleItem {
+  id: string;
+  gameTitle: string;
+  awayTeam: NflGameTeam;
+  homeTeam: NflGameTeam;
+  kickoffTime: string; // e.g. "Thursday, Sep 5 • 8:20 PM EDT"
+  kickoffDate: string; // e.g. "Sep 5, 2024"
+  timeSlot: 'Thursday Night' | 'Sunday Early' | 'Sunday Late' | 'Sunday Night' | 'Monday Night';
+  broadcastNetwork: string; // e.g. "NBC / Peacock", "FOX", "CBS", "ESPN / ABC", "Prime Video"
+  venue: string; // e.g. "GEHA Field at Arrowhead Stadium, Kansas City, MO"
+  spread: string; // e.g. "KC -3.0"
+  overUnder: string; // e.g. "46.5"
+  moneylineAway: string; // e.g. "+135"
+  moneylineHome: string; // e.g. "-155"
+  weatherForecast: string; // e.g. "72°F, Clear, 5 mph wind"
+  isPrimetime: boolean;
+  status: 'UPCOMING' | 'LIVE' | 'FINAL';
+  headlineNote?: string;
+}
+
+export interface NflScheduleResponse {
+  success: boolean;
+  weekTitle: string;
+  seasonYear: string;
+  totalGames: number;
+  lastUpdated: string;
+  source: string;
+  games: NflGameScheduleItem[];
+}
+
+export type NflSubModelTab =
+  | 'props'
+  | 'matchup'
+  | 'points'
+  | 'predictions'
+  | 'power_ratings'
+  | 'site_benchmarks';
+
+export interface NflMatchupMetric {
+  name: string;
+  category: 'Passing' | 'Rushing' | 'Trench' | 'Efficiency' | 'Defense';
+  awayValue: string | number;
+  homeValue: string | number;
+  awayRank: number;
+  homeRank: number;
+  advantageTeam: 'AWAY' | 'HOME' | 'EVEN';
+  edgeNote: string;
+  unit?: string;
+}
+
+export interface NflMatchupModelData {
+  id: string;
+  matchupTitle: string;
+  awayTeam: NflGameTeam;
+  homeTeam: NflGameTeam;
+  offensiveLineAdvantage: 'AWAY' | 'HOME' | 'EVEN';
+  defensivePressureAdvantage: 'AWAY' | 'HOME' | 'EVEN';
+  redZoneAdvantage: 'AWAY' | 'HOME' | 'EVEN';
+  passingEfficiencyAdvantage: 'AWAY' | 'HOME' | 'EVEN';
+  rushingEfficiencyAdvantage: 'AWAY' | 'HOME' | 'EVEN';
+  metrics: NflMatchupMetric[];
+  strategicKeyTakeaways: string[];
+}
+
+export interface NflPointsModelData {
+  id: string;
+  matchupTitle: string;
+  awayTeam: NflGameTeam;
+  homeTeam: NflGameTeam;
+  consensusTotal: number;
+  modelProjectedTotal: number;
+  totalDifferential: number;
+  modelRecommendation: 'OVER' | 'UNDER' | 'NEUTRAL';
+  overProbability: number;
+  underProbability: number;
+  edgePercent: number;
+  confidenceStars: number;
+  paceMetrics: {
+    awaySecondsPerPlay: number;
+    homeSecondsPerPlay: number;
+    projectedTotalPlays: number;
+    paceRankAway: number;
+    paceRankHome: number;
+    paceStyle: string;
+  };
+  impliedTeamTotals: {
+    awayImplied: number;
+    homeImplied: number;
+  };
+  weatherFactor: {
+    temperature: string;
+    windSpeedMph: number;
+    precipitationChance: number;
+    passingImpactPenalty: string;
+    totalPointAdjustment: number;
+  };
+  scoringDistribution: {
+    range: string;
+    probability: number;
+  }[];
+  simulationNotes: string[];
+  recentActivityShift?: NflRecentActivityShift;
+}
+
+export interface NflPredictionsModelData {
+  id: string;
+  matchupTitle: string;
+  awayTeam: NflGameTeam;
+  homeTeam: NflGameTeam;
+  projectedScoreAway: number;
+  projectedScoreHome: number;
+  moneylineAway: string;
+  moneylineHome: string;
+  spreadConsensus: string;
+  spreadModel: string;
+  spreadCoverEdge: number;
+  awayCoverProbability: number;
+  homeCoverProbability: number;
+  spreadPick: string;
+  spreadConfidenceStars: number;
+  moneylineWinProbAway: number;
+  moneylineWinProbHome: number;
+  moneylineEdgeAway: number;
+  moneylineEdgeHome: number;
+  simulationsCount: number;
+  keyOutcomeDistributions: {
+    marginRange: string;
+    probability: number;
+  }[];
+  consensusSignals: {
+    source: string;
+    pick: string;
+    confidence: string;
+  }[];
+  recentActivityShift?: NflRecentActivityShift;
+  spreadActivityShift?: NflRecentActivityShift;
+  moneylineActivityShift?: NflRecentActivityShift;
+}
+
+export interface NflPowerRatingsData {
+  id: string;
+  matchupTitle: string;
+  awayTeam: NflGameTeam;
+  homeTeam: NflGameTeam;
+  awayPowerRating: number;
+  homePowerRating: number;
+  awayRank: number;
+  homeRank: number;
+  netPowerDiff: number;
+  homeFieldAdvantagePts: number;
+  restDifferentialDays: number;
+  travelMilesImpact: string;
+  qbReplacementValuePts: {
+    awayQb: string;
+    awayQbWar: number;
+    homeQb: string;
+    homeQbWar: number;
+  };
+  situationalTrends: string[];
+}
+
+export interface NflSiteBenchmark {
+  id: string;
+  siteName: string;
+  badge: string;
+  siteUrl: string;
+  headlineSummary: string;
+  modelArchitecture: string;
+  keyFeatures: string[];
+  metricsUsed: string[];
+  pros: string[];
+  limitations: string[];
+  cloudboyxEnhancement: string;
+}
+

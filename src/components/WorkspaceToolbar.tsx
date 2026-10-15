@@ -9,11 +9,14 @@ import {
   Radio,
   Boxes,
   Share2,
+  User,
+  Trophy,
 } from 'lucide-react';
+import { ActiveWorkspaceView } from '../types';
 
 interface WorkspaceToolbarProps {
-  activeView: 'model_studio' | 'market_analyzer' | 'erp_connector';
-  onSelectView: (view: 'model_studio' | 'market_analyzer' | 'erp_connector') => void;
+  activeView: ActiveWorkspaceView;
+  onSelectView: (view: ActiveWorkspaceView) => void;
   bankroll: number;
   openPositionsCount: number;
   onOpenPortfolio: () => void;
@@ -69,6 +72,20 @@ export const WorkspaceToolbar: React.FC<WorkspaceToolbarProps> = ({
           >
             <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Contract Analyzer</span>
+          </button>
+
+          <button
+            id="toolbar-player-props-tab"
+            onClick={() => onSelectView('player_props')}
+            className={`inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              activeView === 'player_props'
+                ? 'bg-[#03045e] text-white shadow-xs'
+                : 'text-stone-600 hover:text-[#03045e] hover:bg-stone-200/60'
+            }`}
+            title="NFL Predict: Player Props, Trench Matchups, Over/Under Points, Score Predictions & Power Ratings"
+          >
+            <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+            <span>NFL Predict</span>
           </button>
 
           <button

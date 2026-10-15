@@ -34,9 +34,11 @@ import {
   Mail,
   ExternalLink,
   Globe,
+  Trophy,
 } from 'lucide-react';
 import { exportAnalysisAsJson } from '../utils/exportUtils';
 import { ShareModal } from './ShareModal';
+import { NflMarketMetricsCard } from './NflMarketMetricsCard';
 
 const STORAGE_KEY_PRICE_ALERTS = 'cloudboyx_price_alerts';
 
@@ -102,6 +104,8 @@ interface OddsOverviewCardProps {
   };
   volatilityChecks?: PriceCheckRecord[];
   onExportData?: () => void;
+  isNflMode?: boolean;
+  onToggleNflMode?: (enabled: boolean) => void;
 }
 
 export const OddsOverviewCard: React.FC<OddsOverviewCardProps> = ({
@@ -111,7 +115,15 @@ export const OddsOverviewCard: React.FC<OddsOverviewCardProps> = ({
   volatilitySummary,
   volatilityChecks,
   onExportData,
+  isNflMode,
+  onToggleNflMode,
 }) => {
+  const [internalNflMode, setInternalNflMode] = useState<boolean>(false);
+  const isNflActive = isNflMode !== undefined ? isNflMode : internalNflMode;
+  const handleToggleNflMode = (val: boolean) => {
+    setInternalNflMode(val);
+    onToggleNflMode?.(val);
+  };
   const probabilities = analysis?.probabilities || {
     calibratedYesPercent: 50,
     fairContractCents: 50,
@@ -1082,202 +1094,275 @@ export const OddsOverviewCard: React.FC<OddsOverviewCardProps> = ({
         </div>
       ) : null}
 
-      {/* Main Odds Matrix */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Model Calibrated Probability */}
-        <div className="bg-[#caf0f8]/30 rounded-xl p-4 sm:p-5 border border-[#90e0ef] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between text-xs text-[#0077b6] font-bold uppercase tracking-wider mb-2">
-              <span>Model Calibrated Odds</span>
-              <Target className="w-4 h-4 text-[#0077b6]" />
-            </div>
-            <div className="flex items-baseline space-x-2">
-              <span className="text-4xl font-extrabold text-[#03045e] tracking-tight">
-                {probabilities.calibratedYesPercent}%
-              </span>
-              <span className="text-sm font-semibold text-[#0077b6]">
-                ({probabilities.fairContractCents}¢ fair value)
-              </span>
-            </div>
-            <p className="text-xs text-stone-600 mt-2">
-              Synthesized Brier-calibrated fair contract value for <strong className="text-[#03045e]">YES</strong>.
-            </p>
+      {/* Conditional UI Toggle: Generic Market Contract vs NFL Football Mode */}
+      <div
+        id="market-analyzer-mode-switcher-card"
+        className="p-3.5 rounded-xl bg-stone-50 border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+      >
+        <div className="flex items-center space-x-2.5">
+          <div
+            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+              isNflActive ? 'bg-[#03045e] text-[#caf0f8]' : 'bg-[#0077b6] text-white'
+            }`}
+          >
+            {isNflActive ? <Trophy className="w-4 h-4 text-[#90e0ef]" /> : <Target className="w-4 h-4 text-white" />}
           </div>
-
-          <div className="mt-4 pt-3 border-t border-[#90e0ef]/70 flex items-center justify-between text-xs">
-            <span className="text-stone-500 font-medium">90% Confidence Band:</span>
-            <span className="font-semibold text-[#03045e]">
-              [{probabilities.confidenceInterval.low}% &ndash; {probabilities.confidenceInterval.high}%]
-            </span>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-bold text-[#03045e] uppercase tracking-wider">
+                Analysis Parameters: {isNflActive ? 'NFL Football Mode' : 'Standard Market Contract'}
+              </span>
+              <span
+                className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                  isNflActive ? 'bg-[#caf0f8] text-[#0077b6] border border-[#00b4d8]' : 'bg-stone-200 text-stone-700'
+                }`}
+              >
+                {isNflActive ? '🏈 SPORT-SPECIFIC' : '📊 GENERIC CONTRACT'}
+              </span>
+            </div>
+            <p className="text-[11px] text-stone-500">
+              {isNflActive
+                ? "Showing 'Game Spread', 'Over/Under', and 'Team Depth Chart' in place of generic market contract fields."
+                : "Showing Kalshi orderbook, contract pricing, implied probabilities, and binary Yes/No resolution."}
+            </p>
           </div>
         </div>
 
-        {/* Current Kalshi Market Contract Price */}
-        <div className="bg-stone-50 rounded-xl p-4 sm:p-5 border border-stone-200 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between text-xs text-stone-500 font-semibold uppercase tracking-wider mb-2">
-              <span>Kalshi Market Price</span>
-              <span className="font-mono text-stone-400">Orderbook</span>
-            </div>
-            <div className="flex items-baseline space-x-2">
-              <span className="text-4xl font-extrabold text-stone-900 tracking-tight">
-                {marketEconomics.marketPriceCents}¢
-              </span>
-              <span className="text-sm font-semibold text-stone-500">
-                (${marketEconomics.yesCostPerContract.toFixed(2)}/contract)
-              </span>
-            </div>
-            <p className="text-xs text-stone-600 mt-2">
-              Implied market probability: <strong>{marketEconomics.impliedMarketProb}%</strong> (NO contract at {100 - marketEconomics.marketPriceCents}¢).
-            </p>
-          </div>
+        {/* Mode Toggle Buttons */}
+        <div className="inline-flex p-1 bg-stone-200/80 rounded-xl shrink-0 self-start sm:self-auto">
+          <button
+            type="button"
+            id="toggle-generic-contract-btn"
+            onClick={() => handleToggleNflMode(false)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              !isNflActive ? 'bg-white text-[#03045e] shadow-2xs' : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            Generic Contract
+          </button>
+          <button
+            type="button"
+            id="toggle-nfl-football-btn"
+            onClick={() => handleToggleNflMode(true)}
+            className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              isNflActive ? 'bg-[#03045e] text-white shadow-2xs' : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <Trophy className="w-3.5 h-3.5 text-[#90e0ef]" />
+            <span>NFL Football</span>
+          </button>
+        </div>
+      </div>
 
-          <div className="mt-4 pt-3 border-t border-stone-200 flex flex-col gap-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-stone-500 font-medium">Certainty Score:</span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#caf0f8] text-[#03045e] border border-[#90e0ef]">
-                {probabilities.confidenceScore} Confidence
-              </span>
-            </div>
-            {volatilitySummary && (
-              <div className="flex items-center justify-between pt-1.5 border-t border-stone-200/60">
-                <span className="text-stone-500 font-medium flex items-center space-x-1">
-                  <Activity className="w-3 h-3 text-[#0077b6]" />
-                  <span>3-Check Volatility:</span>
-                </span>
-                <span className={`inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10.5px] font-bold ${
-                  volatilitySummary.level === 'HIGH'
-                    ? 'bg-[#caf0f8] text-[#03045e] border border-[#0077b6]'
-                    : volatilitySummary.level === 'MODERATE'
-                    ? 'bg-[#caf0f8] text-[#0077b6] border border-[#90e0ef]'
-                    : 'bg-[#caf0f8]/60 text-[#0077b6]'
-                }`}>
-                  <span>{volatilitySummary.level}</span>
-                  <span className="font-mono font-normal">({volatilitySummary.rangeCents}¢ range)</span>
+      {isNflActive ? (
+        <NflMarketMetricsCard
+          analysis={analysis}
+          onTradeClick={onTradeClick}
+          onOpenEli6={onOpenEli6}
+          onExportData={onExportData}
+          isNflMode={isNflActive}
+          onToggleNflMode={handleToggleNflMode}
+        />
+      ) : (
+        <>
+          {/* Main Odds Matrix */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Model Calibrated Probability */}
+            <div className="bg-[#caf0f8]/30 rounded-xl p-4 sm:p-5 border border-[#90e0ef] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs text-[#0077b6] font-bold uppercase tracking-wider mb-2">
+                  <span>Model Calibrated Odds</span>
+                  <Target className="w-4 h-4 text-[#0077b6]" />
+                </div>
+                <div className="flex items-baseline space-x-2">
+                  <span className="text-4xl font-extrabold text-[#03045e] tracking-tight">
+                    {probabilities.calibratedYesPercent}%
+                  </span>
+                  <span className="text-sm font-semibold text-[#0077b6]">
+                    ({probabilities.fairContractCents}¢ fair value)
+                  </span>
+                </div>
+                <p className="text-xs text-stone-600 mt-2">
+                  Synthesized Brier-calibrated fair contract value for <strong className="text-[#03045e]">YES</strong>.
+                </p>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-[#90e0ef]/70 flex items-center justify-between text-xs">
+                <span className="text-stone-500 font-medium">90% Confidence Band:</span>
+                <span className="font-semibold text-[#03045e]">
+                  [{probabilities.confidenceInterval.low}% &ndash; {probabilities.confidenceInterval.high}%]
                 </span>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Model Edge & Recommendation */}
-        <div className={`rounded-xl p-4 sm:p-5 border flex flex-col justify-between ${
-          isYesAdvantage
-            ? 'bg-[#caf0f8]/80 border-[#0077b6]'
-            : isNoAdvantage
-            ? 'bg-[#caf0f8]/40 border-[#90e0ef]'
-            : 'bg-stone-50 border-stone-200'
-        }`}>
-          <div>
-            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2">
-              <span className={isYesAdvantage ? 'text-[#03045e]' : isNoAdvantage ? 'text-[#0077b6]' : 'text-stone-600'}>
-                Mispricing / Edge
-              </span>
-              {isYesAdvantage ? (
-                <TrendingUp className="w-4 h-4 text-[#0077b6]" />
-              ) : isNoAdvantage ? (
-                <TrendingDown className="w-4 h-4 text-[#03045e]" />
-              ) : (
-                <Minus className="w-4 h-4 text-stone-400" />
-              )}
             </div>
 
-            <div className="flex items-baseline space-x-2">
-              <span className={`text-3xl sm:text-4xl font-extrabold tracking-tight ${
-                isYesAdvantage ? 'text-[#03045e]' : isNoAdvantage ? 'text-[#0077b6]' : 'text-stone-900'
-              }`}>
-                {marketEconomics.edgePercentage > 0 ? `+${marketEconomics.edgePercentage}%` : `${marketEconomics.edgePercentage}%`}
-              </span>
-              <span className="text-xs font-medium text-stone-600">
-                {isYesAdvantage ? 'in favor of YES' : isNoAdvantage ? 'in favor of NO' : 'Fairly priced'}
-              </span>
+            {/* Current Kalshi Market Contract Price */}
+            <div className="bg-stone-50 rounded-xl p-4 sm:p-5 border border-stone-200 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs text-stone-500 font-semibold uppercase tracking-wider mb-2">
+                  <span>Kalshi Market Price</span>
+                  <span className="font-mono text-stone-400">Orderbook</span>
+                </div>
+                <div className="flex items-baseline space-x-2">
+                  <span className="text-4xl font-extrabold text-stone-900 tracking-tight">
+                    {marketEconomics.marketPriceCents}¢
+                  </span>
+                  <span className="text-sm font-semibold text-stone-500">
+                    (${marketEconomics.yesCostPerContract.toFixed(2)}/contract)
+                  </span>
+                </div>
+                <p className="text-xs text-stone-600 mt-2">
+                  Implied market probability: <strong>{marketEconomics.impliedMarketProb}%</strong> (NO contract at {100 - marketEconomics.marketPriceCents}¢).
+                </p>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-stone-200 flex flex-col gap-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-stone-500 font-medium">Certainty Score:</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-[#caf0f8] text-[#03045e] border border-[#90e0ef]">
+                    {probabilities.confidenceScore} Confidence
+                  </span>
+                </div>
+                {volatilitySummary && (
+                  <div className="flex items-center justify-between pt-1.5 border-t border-stone-200/60">
+                    <span className="text-stone-500 font-medium flex items-center space-x-1">
+                      <Activity className="w-3 h-3 text-[#0077b6]" />
+                      <span>3-Check Volatility:</span>
+                    </span>
+                    <span className={`inline-flex items-center space-x-1 px-1.5 py-0.5 rounded text-[10.5px] font-bold ${
+                      volatilitySummary.level === 'HIGH'
+                        ? 'bg-[#caf0f8] text-[#03045e] border border-[#0077b6]'
+                        : volatilitySummary.level === 'MODERATE'
+                        ? 'bg-[#caf0f8] text-[#0077b6] border border-[#90e0ef]'
+                        : 'bg-[#caf0f8]/60 text-[#0077b6]'
+                    }`}>
+                      <span>{volatilitySummary.level}</span>
+                      <span className="font-mono font-normal">({volatilitySummary.rangeCents}¢ range)</span>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <p className="text-xs mt-2 text-stone-700">
-              {marketEconomics.recommendedAction === 'BUY YES' && (
-                <>Market underprices YES by {marketEconomics.edgePercentage}¢. Positive expected value on YES contracts.</>
-              )}
-              {marketEconomics.recommendedAction === 'BUY NO' && (
-                <>Market overprices YES (underprices NO by {Math.abs(marketEconomics.edgePercentage)}¢). Positive expected value on NO contracts.</>
-              )}
-              {marketEconomics.recommendedAction === 'PASS (Fairly Priced)' && (
-                <>Market contract closely matches fair odds. Expected return does not overcome fees.</>
-              )}
-            </p>
-          </div>
-
-          <div className="mt-4 pt-3 border-t border-stone-200/60 flex items-center justify-between">
-            <span className="text-xs font-medium text-stone-600">Action:</span>
-            <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+            {/* Model Edge & Recommendation */}
+            <div className={`rounded-xl p-4 sm:p-5 border flex flex-col justify-between ${
               isYesAdvantage
-                ? 'bg-[#0077b6] text-white'
+                ? 'bg-[#caf0f8]/80 border-[#0077b6]'
                 : isNoAdvantage
-                ? 'bg-[#03045e] text-white'
-                : 'bg-stone-300 text-stone-800'
+                ? 'bg-[#caf0f8]/40 border-[#90e0ef]'
+                : 'bg-stone-50 border-stone-200'
             }`}>
-              {marketEconomics.recommendedAction}
-            </span>
+              <div>
+                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2">
+                  <span className={isYesAdvantage ? 'text-[#03045e]' : isNoAdvantage ? 'text-[#0077b6]' : 'text-stone-600'}>
+                    Mispricing / Edge
+                  </span>
+                  {isYesAdvantage ? (
+                    <TrendingUp className="w-4 h-4 text-[#0077b6]" />
+                  ) : isNoAdvantage ? (
+                    <TrendingDown className="w-4 h-4 text-[#03045e]" />
+                  ) : (
+                    <Minus className="w-4 h-4 text-stone-400" />
+                  )}
+                </div>
+
+                <div className="flex items-baseline space-x-2">
+                  <span className={`text-3xl sm:text-4xl font-extrabold tracking-tight ${
+                    isYesAdvantage ? 'text-[#03045e]' : isNoAdvantage ? 'text-[#0077b6]' : 'text-stone-900'
+                  }`}>
+                    {marketEconomics.edgePercentage > 0 ? `+${marketEconomics.edgePercentage}%` : `${marketEconomics.edgePercentage}%`}
+                  </span>
+                  <span className="text-xs font-medium text-stone-600">
+                    {isYesAdvantage ? 'in favor of YES' : isNoAdvantage ? 'in favor of NO' : 'Fairly priced'}
+                  </span>
+                </div>
+
+                <p className="text-xs mt-2 text-stone-700">
+                  {marketEconomics.recommendedAction === 'BUY YES' && (
+                    <>Market underprices YES by {marketEconomics.edgePercentage}¢. Positive expected value on YES contracts.</>
+                  )}
+                  {marketEconomics.recommendedAction === 'BUY NO' && (
+                    <>Market overprices YES (underprices NO by {Math.abs(marketEconomics.edgePercentage)}¢). Positive expected value on NO contracts.</>
+                  )}
+                  {marketEconomics.recommendedAction === 'PASS (Fairly Priced)' && (
+                    <>Market contract closely matches fair odds. Expected return does not overcome fees.</>
+                  )}
+                </p>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-stone-200/60 flex items-center justify-between">
+                <span className="text-xs font-medium text-stone-600">Action:</span>
+                <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                  isYesAdvantage
+                    ? 'bg-[#0077b6] text-white'
+                    : isNoAdvantage
+                    ? 'bg-[#03045e] text-white'
+                    : 'bg-stone-300 text-stone-800'
+                }`}>
+                  {marketEconomics.recommendedAction}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Probability Distribution Visual Bar */}
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs font-medium text-stone-600">
-          <span className="text-[#0077b6] font-bold">YES Probability: {probabilities.calibratedYesPercent}%</span>
-          <span className="text-stone-400">Market Price: {marketEconomics.marketPriceCents}¢</span>
-          <span className="text-[#03045e] font-bold">NO Probability: {probabilities.calibratedNoPercent}%</span>
-        </div>
-        <div className="w-full h-3 bg-stone-200 rounded-full overflow-hidden flex relative">
-          <div
-            className="bg-[#0077b6] transition-all duration-700"
-            style={{ width: `${probabilities.calibratedYesPercent}%` }}
-          />
-          <div
-            className="bg-[#03045e] transition-all duration-700"
-            style={{ width: `${probabilities.calibratedNoPercent}%` }}
-          />
-          {/* Market price marker pin */}
-          <div
-            className="absolute top-0 bottom-0 w-1 bg-[#00b4d8] shadow-md"
-            style={{ left: `calc(${marketEconomics.marketPriceCents}% - 2px)` }}
-            title={`Market Price: ${marketEconomics.marketPriceCents}¢`}
-          />
-        </div>
-        <div className="flex justify-between text-[11px] text-stone-500">
-          <span>Contract payout: $1.00 if YES</span>
-          <span className="flex items-center space-x-1">
-            <span className="w-2 h-2 rounded-full bg-[#00b4d8] inline-block" />
-            <span>Cyan line marks current Kalshi market price ({marketEconomics.marketPriceCents}¢)</span>
-          </span>
-          <span>Contract payout: $1.00 if NO</span>
-        </div>
-      </div>
+          {/* Probability Distribution Visual Bar */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-xs font-medium text-stone-600">
+              <span className="text-[#0077b6] font-bold">YES Probability: {probabilities.calibratedYesPercent}%</span>
+              <span className="text-stone-400">Market Price: {marketEconomics.marketPriceCents}¢</span>
+              <span className="text-[#03045e] font-bold">NO Probability: {probabilities.calibratedNoPercent}%</span>
+            </div>
+            <div className="w-full h-3 bg-stone-200 rounded-full overflow-hidden flex relative">
+              <div
+                className="bg-[#0077b6] transition-all duration-700"
+                style={{ width: `${probabilities.calibratedYesPercent}%` }}
+              />
+              <div
+                className="bg-[#03045e] transition-all duration-700"
+                style={{ width: `${probabilities.calibratedNoPercent}%` }}
+              />
+              {/* Market price marker pin */}
+              <div
+                className="absolute top-0 bottom-0 w-1 bg-[#00b4d8] shadow-md"
+                style={{ left: `calc(${marketEconomics.marketPriceCents}% - 2px)` }}
+                title={`Market Price: ${marketEconomics.marketPriceCents}¢`}
+              />
+            </div>
+            <div className="flex justify-between text-[11px] text-stone-500">
+              <span>Contract payout: $1.00 if YES</span>
+              <span className="flex items-center space-x-1">
+                <span className="w-2 h-2 rounded-full bg-[#00b4d8] inline-block" />
+                <span>Cyan line marks current Kalshi market price ({marketEconomics.marketPriceCents}¢)</span>
+              </span>
+              <span>Contract payout: $1.00 if NO</span>
+            </div>
+          </div>
 
-      {/* Interactive Quick Trade Trigger */}
-      <div className="pt-4 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="text-xs text-stone-600">
-          Ready to test this edge? Place a simulated paper trade to track your P&amp;L risk-free.
-        </div>
-        <div className="flex items-center space-x-2 w-full sm:w-auto">
-          <button
-            id="buy-yes-trigger-btn"
-            onClick={() => onTradeClick('YES')}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#0077b6] hover:bg-[#00b4d8] hover:text-[#03045e] text-white transition-colors cursor-pointer shadow-xs"
-          >
-            <span>Paper Buy YES ({marketEconomics.marketPriceCents}¢)</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
-          <button
-            id="buy-no-trigger-btn"
-            onClick={() => onTradeClick('NO')}
-            className="flex-1 sm:flex-initial inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#03045e] hover:bg-[#0077b6] text-white transition-colors cursor-pointer shadow-xs"
-          >
-            <span>Paper Buy NO ({100 - marketEconomics.marketPriceCents}¢)</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
+          {/* Interactive Quick Trade Trigger */}
+          <div className="pt-4 border-t border-stone-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="text-xs text-stone-600">
+              Ready to test this edge? Place a simulated paper trade to track your P&amp;L risk-free.
+            </div>
+            <div className="flex items-center space-x-2 w-full sm:w-auto">
+              <button
+                id="buy-yes-trigger-btn"
+                onClick={() => onTradeClick('YES')}
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#0077b6] hover:bg-[#00b4d8] hover:text-[#03045e] text-white transition-colors cursor-pointer shadow-xs"
+              >
+                <span>Paper Buy YES ({marketEconomics.marketPriceCents}¢)</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                id="buy-no-trigger-btn"
+                onClick={() => onTradeClick('NO')}
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#03045e] hover:bg-[#0077b6] text-white transition-colors cursor-pointer shadow-xs"
+              >
+                <span>Paper Buy NO ({100 - marketEconomics.marketPriceCents}¢)</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Multi-Platform Distribution Modal */}
       {isShareModalOpen && analysis && (

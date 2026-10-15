@@ -27,10 +27,11 @@ import {
   Radio,
   ShoppingBag,
 } from 'lucide-react';
+import { ActiveWorkspaceView } from '../types';
 
 interface WalkthroughBotProps {
-  activeView: 'model_studio' | 'market_analyzer' | 'erp_connector';
-  onSelectView: (view: 'model_studio' | 'market_analyzer' | 'erp_connector') => void;
+  activeView: ActiveWorkspaceView;
+  onSelectView: (view: ActiveWorkspaceView) => void;
   onOpenTrainingDocs: () => void;
   onOpenPortfolio: () => void;
   onOpenIngestion: () => void;
@@ -45,7 +46,7 @@ interface ChatMessage {
   suggestedAction?: {
     label: string;
     sectionId: string;
-    view?: 'model_studio' | 'market_analyzer' | 'erp_connector';
+    view?: ActiveWorkspaceView;
   };
 }
 
@@ -54,7 +55,7 @@ interface SectionGuide {
   title: string;
   subtitle: string;
   icon: React.ComponentType<{ className?: string }>;
-  view: 'model_studio' | 'market_analyzer' | 'erp_connector';
+  view: ActiveWorkspaceView;
   domId: string;
   whatItDoes: string;
   keyMetrics: string[];

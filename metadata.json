@@ -1,6 +1,6 @@
 {
   "name": "CloudboyX",
-  "description": "An enterprise AI-powered Bayesian forecasting and probability research pipeline with multi-perspective debate, calibrated odds, expected value calculation, and CloudboyX Connect universal webhook & EDI studio.",
+  "description": "An enterprise AI-powered Bayesian forecasting and probability research pipeline with NFL Models Hub (Player Props, Matchups, Points & Totals, Score Predictions, Power Ratings & Sports Prediction Sites Benchmarks), NFL Schedule Guide, multi-perspective debate, and CloudboyX Connect universal webhook & EDI studio.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

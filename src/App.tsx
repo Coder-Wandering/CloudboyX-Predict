@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   ProbabilityAnalysisResult,
   PaperTradePosition,
@@ -33,9 +33,38 @@ import { CloudboyXSuiteModal } from './components/CloudboyXSuiteModal';
 import { EnterpriseWebhookStudio } from './components/EnterpriseWebhookStudio';
 import { ShareModal } from './components/ShareModal';
 import { PRESET_EVENTS } from './data/presetEvents';
-import { AlertCircle, CheckCircle, Download, X, Copy, Check, FileText, Pause, Play } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle,
+  Download,
+  X,
+  Copy,
+  Check,
+  FileText,
+  Pause,
+  Play,
+  Trophy,
+  Target,
+  User,
+  RefreshCw,
+  Calendar,
+  TrendingUp,
+  TrendingDown,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  Zap,
+  Activity,
+  AlertTriangle,
+} from 'lucide-react';
 import { exportAnalysisAsJson } from './utils/exportUtils';
 import { AccessGateModal, UserSession } from './components/AccessGateModal';
+import { PlayerPropsModal } from './components/PlayerPropsModal';
+import { PlayerPropsAnalyzerView } from './components/PlayerPropsAnalyzerView';
+import { NflHubView } from './components/NflHubView';
+import { NflScheduleTab } from './components/NflScheduleTab';
+import { NflPlayerPropsResponse, ActiveWorkspaceView } from './types';
+import { getMockPlayerPropsResponse } from './data/nflPlayerProps';
 
 export default function App() {
   // Gatekeeper authentication state
@@ -90,10 +119,16 @@ export default function App() {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  const [activeView, setActiveView] = useState<'model_studio' | 'market_analyzer' | 'erp_connector'>('model_studio');
+  const [activeView, setActiveView] = useState<ActiveWorkspaceView>('model_studio');
+  const [marketAnalyzerSubTab, setMarketAnalyzerSubTab] = useState<'analysis' | 'nfl_schedule'>('analysis');
   const [activeAnalysis, setActiveAnalysis] = useState<ProbabilityAnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [marketAnalyzerNflMode, setMarketAnalyzerNflMode] = useState<boolean>(false);
+  const [isPlayerPropsModalOpen, setIsPlayerPropsModalOpen] = useState<boolean>(false);
+  const [playerPropsData, setPlayerPropsData] = useState<NflPlayerPropsResponse | null>(null);
+  const [isPlayerPropsLoading, setIsPlayerPropsLoading] = useState<boolean>(false);
+  const [selectedPlayerPropsMatchup, setSelectedPlayerPropsMatchup] = useState<string>('ALL');
 
   // Ingestion & Model states
   const [ingestedData, setIngestedData] = useState<IngestedPayload | null>(null);
@@ -155,6 +190,7 @@ export default function App() {
   const toastStartTimeRef = useRef<number>(0);
   const toastRemainingMsRef = useRef<number>(0);
   const [isGlobalShareOpen, setIsGlobalShareOpen] = useState<boolean>(false);
+  const [isSimulatedSpikeActive, setIsSimulatedSpikeActive] = useState<boolean>(false);
 
   // Handle export analysis object as JSON file
   const handleExportAnalysisData = () => {
@@ -510,6 +546,22 @@ export default function App() {
       const data = await res.json();
       if (data.result) {
         setActiveAnalysis(data.result);
+        const lowerQ = `${query} ${data.result.eventTitle || ''}`.toLowerCase();
+        if (
+          lowerQ.includes('nfl') ||
+          lowerQ.includes('football') ||
+          lowerQ.includes('chiefs') ||
+          lowerQ.includes('ravens') ||
+          lowerQ.includes('lions') ||
+          lowerQ.includes('packers') ||
+          lowerQ.includes('bills') ||
+          lowerQ.includes('dolphins') ||
+          lowerQ.includes('eagles') ||
+          lowerQ.includes('cowboys') ||
+          lowerQ.includes('super bowl')
+        ) {
+          setMarketAnalyzerNflMode(true);
+        }
       } else {
         throw new Error(data.error || 'Failed to generate probability analysis');
       }
@@ -518,6 +570,66 @@ export default function App() {
       setError(err.message || 'Error executing forecasting pipeline.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Fetch live NFL player props via mock API
+  const handleFetchPlayerProps = async (matchup?: string) => {
+    setIsPlayerPropsLoading(true);
+    const targetMatchup = matchup !== undefined ? matchup : selectedPlayerPropsMatchup;
+    try {
+      const url =
+        targetMatchup && targetMatchup !== 'ALL'
+          ? `/api/nfl/player-props?matchup=${encodeURIComponent(targetMatchup)}`
+          : '/api/nfl/player-props';
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        setPlayerPropsData(data);
+      } else {
+        setPlayerPropsData(getMockPlayerPropsResponse(targetMatchup));
+      }
+    } catch (err) {
+      console.warn('Failed to fetch player props from API, using fallback:', err);
+      setPlayerPropsData(getMockPlayerPropsResponse(targetMatchup));
+    } finally {
+      setIsPlayerPropsLoading(false);
+    }
+  };
+
+  // Auto-fetch player props when switching to player_props view
+  useEffect(() => {
+    if (activeView === 'player_props' && !playerPropsData) {
+      handleFetchPlayerProps(selectedPlayerPropsMatchup);
+    }
+  }, [activeView, playerPropsData, selectedPlayerPropsMatchup]);
+
+  // Handle simulated paper bet from Player Props modal
+  const handlePlacePlayerPropBet = (
+    playerName: string,
+    propType: string,
+    side: 'OVER' | 'UNDER',
+    line: number
+  ) => {
+    const cost = 50; // standard 50c paper contract
+    const shares = 10;
+    const totalCost = (cost * shares) / 100;
+    if (bankroll >= totalCost) {
+      setBankroll((b) => Number((b - totalCost).toFixed(2)));
+      const newPos: PaperTradePosition = {
+        id: `prop-pos-${Date.now()}`,
+        analysisId: 'nfl-prop-feed',
+        eventTitle: `${playerName} - ${propType} ${side} ${line}`,
+        contractType: side === 'OVER' ? 'YES' : 'NO',
+        purchasePriceCents: cost,
+        contractsCount: shares,
+        totalCostDollars: totalCost,
+        currentProbability: side === 'OVER' ? 62 : 38,
+        unrealizedPnLDollars: 0,
+        status: 'OPEN',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setPositions((prev) => [newPos, ...prev]);
     }
   };
 
@@ -639,6 +751,172 @@ export default function App() {
       deltaNet: p3 - p1,
     };
   })() : undefined;
+
+  // 5-minute rolling window price range fluctuation calculation & spike detection (>10% in under 5 minutes)
+  const fiveMinuteVolatility = useMemo(() => {
+    const checks = currentEventChecks;
+    if (!checks || checks.length < 2) {
+      return {
+        hasSpike: false,
+        rangeCents: 0,
+        fluctuationPercent: 0,
+        minPrice: activeAnalysis?.marketEconomics.marketPriceCents ?? 50,
+        maxPrice: activeAnalysis?.marketEconomics.marketPriceCents ?? 50,
+        checksCount: checks?.length ?? 0,
+      };
+    }
+
+    const now = Date.now();
+    const parseCheckTime = (check: PriceCheckRecord, index: number, total: number): number => {
+      if (check.id) {
+        const m = check.id.match(/check-(\d{12,})/);
+        if (m) return Number(m[1]);
+      }
+      if (check.timestamp) {
+        const parsed = Date.parse(check.timestamp);
+        if (!isNaN(parsed)) return parsed;
+        const timeMatch = check.timestamp.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+        if (timeMatch) {
+          const d = new Date();
+          let h = parseInt(timeMatch[1], 10);
+          const min = parseInt(timeMatch[2], 10);
+          const s = timeMatch[3] ? parseInt(timeMatch[3], 10) : 0;
+          const ampm = timeMatch[4] ? timeMatch[4].toUpperCase() : null;
+          if (ampm === 'PM' && h < 12) h += 12;
+          if (ampm === 'AM' && h === 12) h = 0;
+          d.setHours(h, min, s, 0);
+          return d.getTime();
+        }
+      }
+      return now - (total - 1 - index) * 60000;
+    };
+
+    const checksWithTime = checks.map((c, i) => ({
+      ...c,
+      timeMs: parseCheckTime(c, i, checks.length),
+    }));
+
+    // Find latest check timestamp
+    const latestTime = Math.max(...checksWithTime.map((c) => c.timeMs), now);
+    const windowStart = latestTime - 5 * 60 * 1000;
+
+    const windowChecks = checksWithTime.filter((c) => c.timeMs >= windowStart);
+    const evalChecks = windowChecks.length >= 2 ? windowChecks : checksWithTime.slice(-3);
+
+    const prices = evalChecks.map((c) => c.priceCents);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const rangeCents = maxPrice - minPrice;
+
+    // Relative percentage fluctuation relative to minimum price
+    const relPercent = minPrice > 0 ? ((maxPrice - minPrice) / minPrice) * 100 : 0;
+    // Absolute points on binary contract scale (100 cents = 100%)
+    const absPointsPercent = rangeCents;
+
+    // Max step percentage between consecutive ticks
+    let maxStepPct = 0;
+    for (let i = 1; i < evalChecks.length; i++) {
+      const prev = evalChecks[i - 1].priceCents;
+      const curr = evalChecks[i].priceCents;
+      if (prev > 0) {
+        const step = (Math.abs(curr - prev) / prev) * 100;
+        if (step > maxStepPct) maxStepPct = step;
+      }
+    }
+
+    const maxObservedPct = Math.max(relPercent, absPointsPercent, maxStepPct);
+    const hasSpike = maxObservedPct >= 10;
+
+    return {
+      hasSpike,
+      rangeCents,
+      fluctuationPercent: Number(maxObservedPct.toFixed(1)),
+      minPrice,
+      maxPrice,
+      checksCount: evalChecks.length,
+    };
+  }, [currentEventChecks, activeAnalysis]);
+
+  const isSpikeActive = isSimulatedSpikeActive || fiveMinuteVolatility.hasSpike;
+  const displayFluctuation = isSimulatedSpikeActive
+    ? Math.max(14.2, fiveMinuteVolatility.fluctuationPercent || 14.2)
+    : fiveMinuteVolatility.fluctuationPercent;
+
+  const handleTriggerSpikeTest = () => {
+    setIsSimulatedSpikeActive(true);
+    if (activeAnalysis) {
+      const currentPrice = activeAnalysis.marketEconomics.marketPriceCents;
+      const spikedPrice = currentPrice >= 80 ? Math.max(5, currentPrice - 15) : Math.min(95, currentPrice + 14);
+      handleRecordPriceCheck(spikedPrice, 'Tick Update');
+    }
+  };
+
+  const displayVolatilitySummary = currentVolatilitySummary || {
+    level: (isSpikeActive ? 'HIGH' : 'LOW') as 'HIGH' | 'MODERATE' | 'LOW',
+    rangeCents: isSpikeActive ? Math.max(10, fiveMinuteVolatility.rangeCents || 10) : 1,
+    deltaNet: 0,
+  };
+
+  // Directional trend calculation: latest tick vs previous average (Up/Down/Neutral)
+  const directionalTickTrend = useMemo(() => {
+    let latestTick: number;
+    let prevAverage: number;
+    let priorChecksCount: number;
+
+    if (currentEventChecks && currentEventChecks.length >= 2) {
+      const latestCheck = currentEventChecks[currentEventChecks.length - 1];
+      latestTick = latestCheck.priceCents;
+      const priorChecks = currentEventChecks.slice(0, -1);
+      const sum = priorChecks.reduce((acc, c) => acc + c.priceCents, 0);
+      prevAverage = sum / priorChecks.length;
+      priorChecksCount = priorChecks.length;
+    } else if (currentEventChecks && currentEventChecks.length === 1) {
+      latestTick = currentEventChecks[0].priceCents;
+      const basePrice = activeAnalysis?.marketEconomics.marketPriceCents ?? 50;
+      prevAverage = basePrice;
+      priorChecksCount = 1;
+    } else {
+      const basePrice = activeAnalysis?.marketEconomics.marketPriceCents ?? 50;
+      const p1 = Math.max(1, Math.min(99, basePrice - 2));
+      const p2 = Math.max(1, Math.min(99, basePrice + 1));
+      const p3 = basePrice;
+      latestTick = p3;
+      prevAverage = (p1 + p2) / 2;
+      priorChecksCount = 2;
+    }
+
+    const delta = latestTick - prevAverage;
+    const roundedDelta = Number(delta.toFixed(1));
+
+    let direction: 'Up' | 'Down' | 'Neutral' = 'Neutral';
+    if (roundedDelta > 0.05) {
+      direction = 'Up';
+    } else if (roundedDelta < -0.05) {
+      direction = 'Down';
+    } else {
+      direction = 'Neutral';
+    }
+
+    return {
+      direction,
+      latestTick,
+      previousAverage: Number(prevAverage.toFixed(1)),
+      delta: roundedDelta,
+      priorChecksCount,
+    };
+  }, [currentEventChecks, activeAnalysis]);
+
+  const handleSimulateDirectionalTick = (target: 'UP' | 'DOWN' | 'NEUTRAL') => {
+    if (!activeAnalysis) return;
+    const prevAvg = directionalTickTrend.previousAverage;
+    let targetPrice = Math.round(prevAvg);
+    if (target === 'UP') {
+      targetPrice = Math.min(99, Math.round(prevAvg + 3));
+    } else if (target === 'DOWN') {
+      targetPrice = Math.max(1, Math.round(prevAvg - 3));
+    }
+    handleRecordPriceCheck(targetPrice, 'Tick Update');
+  };
 
   return (
     <div
@@ -765,81 +1043,410 @@ export default function App() {
         {/* VIEW 2: MARKET CONTRACT ANALYZER */}
         {activeView === 'market_analyzer' && (
           <div className="space-y-6">
-            {/* Research Pipeline Search Bar */}
-            <SearchPipelineInput isLoading={isLoading} onAnalyze={handleAnalyze} />
-
-            {/* Pipeline In-Progress Animation */}
-            <PipelineProgress isLoading={isLoading} />
-
-            {/* Error notification if any */}
-            {error && (
-              <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center space-x-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{error}</span>
+            {/* Conditional UI Toggle: Market Analyzer View Parameters Mode */}
+            <div
+              id="market-analyzer-view-mode-bar"
+              className="p-3.5 sm:p-4 rounded-2xl bg-white border border-stone-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 overflow-hidden"
+            >
+              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                <div
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                    marketAnalyzerNflMode
+                      ? 'bg-[#03045e] text-[#caf0f8] shadow-xs'
+                      : 'bg-[#caf0f8] text-[#0077b6]'
+                  }`}
+                >
+                  {marketAnalyzerNflMode ? (
+                    <Trophy className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#90e0ef]" />
+                  ) : (
+                    <Target className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#0077b6]" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="text-xs font-extrabold text-[#03045e] uppercase tracking-wider">
+                      <span className="hidden sm:inline">Analysis </span>Parameters Mode:
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold whitespace-nowrap ${
+                        marketAnalyzerNflMode
+                          ? 'bg-[#caf0f8] text-[#0077b6] border border-[#00b4d8]'
+                          : 'bg-stone-100 text-stone-600 border border-stone-200'
+                      }`}
+                    >
+                      {marketAnalyzerNflMode ? '🏈 NFL FOOTBALL ACTIVE' : '📊 GENERIC CONTRACT'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-stone-500 mt-0.5 line-clamp-2 md:line-clamp-none">
+                    {marketAnalyzerNflMode
+                      ? 'Sport-specific analysis parameters active: showing Game Spread, Over/Under, and Team Depth Chart in place of generic market contract fields.'
+                      : 'Standard market contract parameters active: showing Kalshi orderbook, Yes/No contract prices, and binary resolution.'}
+                  </p>
+                </div>
               </div>
-            )}
 
-            {/* Analysis Results Display */}
-            {activeAnalysis && !isLoading && (
-              <div className="space-y-6">
-                {/* 1. Primary Odds Matrix & Edge Overview */}
-                <OddsOverviewCard
-                  analysis={activeAnalysis}
-                  onTradeClick={handleTradeClick}
-                  onOpenEli6={() => setIsEli6Open(true)}
-                  volatilitySummary={currentVolatilitySummary}
-                  volatilityChecks={currentEventChecks}
-                  onExportData={handleExportAnalysisData}
-                />
+              {/* Volatility Summary within the Mode Bar */}
+              <div
+                id="mode-bar-volatility-summary"
+                data-testid="mode-bar-volatility-summary"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-stone-50 border border-stone-200 shrink-0 self-stretch md:self-auto overflow-x-auto no-scrollbar"
+              >
+                <div className="flex items-center space-x-1.5 shrink-0">
+                  <Activity className="w-3.5 h-3.5 text-[#0077b6]" />
+                  <span className="text-[11px] font-bold text-stone-600 uppercase tracking-wider whitespace-nowrap">
+                    <span className="hidden sm:inline">Market </span>Volatility:
+                  </span>
+                  <span
+                    id="mode-bar-volatility-level-badge"
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase whitespace-nowrap border ${
+                      isSpikeActive || displayVolatilitySummary.level === 'HIGH'
+                        ? 'bg-rose-50 text-rose-700 border-rose-300'
+                        : displayVolatilitySummary.level === 'MODERATE'
+                        ? 'bg-amber-50 text-amber-700 border-amber-300'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    }`}
+                  >
+                    {isSpikeActive ? 'HIGH (SPIKE)' : displayVolatilitySummary.level}
+                  </span>
+                  <span id="mode-bar-volatility-price-range" className="text-[11px] font-mono text-stone-600 whitespace-nowrap">
+                    ({displayVolatilitySummary.rangeCents}&cent; range)
+                  </span>
 
-                {/* 2. Market Price Volatility Tracker (Last 3 Consecutive Checks Comparison) */}
-                <MarketPriceVolatilityCard
-                  eventTitle={activeAnalysis.eventTitle}
-                  currentMarketPrice={activeAnalysis.marketEconomics.marketPriceCents}
-                  checks={currentEventChecks}
-                  priceChecksMap={priceChecksMap}
-                  onAddPriceCheck={handleRecordPriceCheck}
-                  isLoadingCheck={isPriceCheckLoading}
-                />
+                  {/* Directional trend arrows (Up/Down/Neutral) next to the price range, based on latest tick vs previous average */}
+                  <div
+                    id="mode-bar-volatility-trend-indicator"
+                    data-testid="mode-bar-volatility-trend-indicator"
+                    data-direction={directionalTickTrend.direction}
+                    className={`inline-flex items-center space-x-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold border shrink-0 transition-all ${
+                      directionalTickTrend.direction === 'Up'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                        : directionalTickTrend.direction === 'Down'
+                        ? 'bg-rose-50 text-rose-700 border-rose-300'
+                        : 'bg-stone-100 text-stone-600 border-stone-200'
+                    }`}
+                    title={`Directional trend: ${directionalTickTrend.direction} | Latest tick: ${directionalTickTrend.latestTick}¢ vs previous average: ${directionalTickTrend.previousAverage}¢ (${directionalTickTrend.delta > 0 ? '+' : ''}${directionalTickTrend.delta}¢)`}
+                  >
+                    {directionalTickTrend.direction === 'Up' && (
+                      <ArrowUp className="w-3 h-3 text-emerald-600 stroke-[2.8]" />
+                    )}
+                    {directionalTickTrend.direction === 'Down' && (
+                      <ArrowDown className="w-3 h-3 text-rose-600 stroke-[2.8]" />
+                    )}
+                    {directionalTickTrend.direction === 'Neutral' && (
+                      <Minus className="w-3 h-3 text-stone-400 stroke-[2.8]" />
+                    )}
+                    <span className="font-extrabold">{directionalTickTrend.direction}</span>
+                    <span className="text-[9px] font-mono opacity-75">
+                      ({directionalTickTrend.delta > 0 ? `+${directionalTickTrend.delta}` : directionalTickTrend.delta}&cent;)
+                    </span>
+                  </div>
+                </div>
 
-                {/* 3. Market Sentiment Trend Tracker (7-Day News & Social Media Aggregate) */}
-                <MarketSentimentTrend
-                  eventTitle={activeAnalysis.eventTitle}
-                  category={activeAnalysis.category}
-                  currentMarketPriceCents={activeAnalysis.marketEconomics.marketPriceCents}
-                />
+                {/* Visual Alert or Spike Indicator that triggers when price range fluctuates >10% in under 5 minutes */}
+                {isSpikeActive ? (
+                  <div
+                    id="volatility-spike-indicator"
+                    data-testid="volatility-spike-indicator"
+                    className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-amber-500 text-white font-bold text-[10.5px] shadow-xs animate-pulse shrink-0 border border-amber-600"
+                    title={`Price range fluctuated ±${displayFluctuation}% in under 5 minutes (>10% threshold exceeded)`}
+                  >
+                    <span className="relative flex h-2 w-2 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-200 opacity-90"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                    </span>
+                    <Zap className="w-3.5 h-3.5 text-amber-100 fill-amber-200 shrink-0" />
+                    <span className="tracking-tight whitespace-nowrap">
+                      SPIKE ALERT: &plusmn;{displayFluctuation}% (&lt;5m)
+                    </span>
+                    {isSimulatedSpikeActive && (
+                      <button
+                        type="button"
+                        id="mode-bar-reset-spike-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsSimulatedSpikeActive(false);
+                        }}
+                        className="ml-1 px-1.5 py-0.2 rounded bg-amber-700 hover:bg-amber-800 text-[9px] text-white cursor-pointer"
+                        title="Reset spike test"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1 shrink-0">
+                    <button
+                      type="button"
+                      id="mode-bar-simulate-spike-btn"
+                      onClick={handleTriggerSpikeTest}
+                      className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold text-stone-500 hover:text-amber-800 hover:bg-amber-100/60 transition-colors border border-dashed border-stone-300 hover:border-amber-400 cursor-pointer shrink-0 whitespace-nowrap"
+                      title="Simulate a >10% price range spike in under 5 minutes to trigger the spike indicator"
+                    >
+                      <Zap className="w-3 h-3 text-amber-500" />
+                      <span className="hidden sm:inline">Test Spike Alert</span>
+                      <span className="sm:hidden">Spike Test</span>
+                    </button>
 
-                {/* 4. Financial Analysis: Expected Value, Fees, Kelly Sizing & Risk Attribution */}
-                <ProbabilityCalculator
-                  marketEconomics={activeAnalysis.marketEconomics}
-                  probabilities={activeAnalysis.probabilities}
-                  analysis={activeAnalysis}
-                />
-
-                {/* 5. Historical Backtest Performance (Last 30 Days for Selected Category) */}
-                <HistoricalBacktestPerformance
-                  analysis={activeAnalysis}
-                  category={activeAnalysis.category}
-                />
-
-                {/* 6. Multi-Agent Dialectic Debate Arena */}
-                <DebateArena
-                  bullAgent={activeAnalysis.bullAgent}
-                  bearAgent={activeAnalysis.bearAgent}
-                  synthesis={activeAnalysis.synthesis}
-                />
-
-                {/* 4. Contract Resolution Rulebook & Ambiguity Traps */}
-                <ResolutionCriteriaCard criteria={activeAnalysis.resolutionCriteria} />
-
-                {/* 5. Key Timeline Catalysts */}
-                <CatalystsTimeline catalysts={activeAnalysis.catalysts} />
+                    {/* Quick Trend Simulators: Up / Down / Neutral */}
+                    <div
+                      id="mode-bar-trend-sim-buttons"
+                      className="inline-flex items-center rounded-lg border border-stone-200 bg-white p-0.5 shadow-2xs shrink-0"
+                      title="Simulate price ticks to test directional trend arrows (Up/Down/Neutral)"
+                    >
+                      <button
+                        type="button"
+                        id="mode-bar-test-trend-up-btn"
+                        onClick={() => handleSimulateDirectionalTick('UP')}
+                        className="px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 hover:bg-emerald-50 rounded transition-colors flex items-center space-x-0.5 cursor-pointer"
+                        title="Simulate tick above previous average (+3¢)"
+                      >
+                        <ArrowUp className="w-2.5 h-2.5 stroke-[2.5]" />
+                        <span>Up</span>
+                      </button>
+                      <button
+                        type="button"
+                        id="mode-bar-test-trend-down-btn"
+                        onClick={() => handleSimulateDirectionalTick('DOWN')}
+                        className="px-1.5 py-0.5 text-[9px] font-bold text-rose-700 hover:bg-rose-50 rounded transition-colors flex items-center space-x-0.5 cursor-pointer"
+                        title="Simulate tick below previous average (-3¢)"
+                      >
+                        <ArrowDown className="w-2.5 h-2.5 stroke-[2.5]" />
+                        <span>Down</span>
+                      </button>
+                      <button
+                        type="button"
+                        id="mode-bar-test-trend-neutral-btn"
+                        onClick={() => handleSimulateDirectionalTick('NEUTRAL')}
+                        className="px-1.5 py-0.5 text-[9px] font-bold text-stone-600 hover:bg-stone-100 rounded transition-colors flex items-center space-x-0.5 cursor-pointer"
+                        title="Simulate tick matching previous average (=)"
+                      >
+                        <Minus className="w-2.5 h-2.5 stroke-[2.5]" />
+                        <span>Flat</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* Actions & Conditional Toggle Controls: horizontal scroll and collapsed compact states for tablet / mobile screens */}
+              <div className="flex items-center gap-2 shrink-0 self-stretch md:self-auto overflow-x-auto no-scrollbar py-0.5 max-w-full">
+                {/* Player Props button that navigates directly to standalone Player Props Analyzer */}
+                {marketAnalyzerNflMode && (
+                  <button
+                    type="button"
+                    id="player-props-btn"
+                    onClick={() => {
+                      if (!playerPropsData) {
+                        handleFetchPlayerProps(selectedPlayerPropsMatchup);
+                      }
+                      setActiveView('player_props');
+                    }}
+                    disabled={isPlayerPropsLoading}
+                    className="inline-flex items-center space-x-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#0077b6] hover:bg-[#0096c7] text-white shadow-xs hover:shadow-sm transition-all cursor-pointer disabled:opacity-50 active:scale-95 border border-[#90e0ef]/40 shrink-0 whitespace-nowrap"
+                    title="Open standalone Player Props Analyzer"
+                  >
+                    <User className="w-3.5 h-3.5 text-[#caf0f8] shrink-0" />
+                    <span className="hidden lg:inline">Player Props Analyzer</span>
+                    <span className="hidden sm:inline lg:hidden">Player Props</span>
+                    <span className="sm:hidden">Props</span>
+                    <span className="hidden md:inline px-1.5 py-0.2 rounded-full text-[9px] font-black bg-[#03045e] text-[#caf0f8] uppercase tracking-wider shrink-0">
+                      Standalone &rarr;
+                    </span>
+                    <span className="md:hidden text-[10px] text-[#caf0f8] font-bold">&rarr;</span>
+                  </button>
+                )}
+
+                {/* Conditional Toggle Control with collapsible labels on compact / tablet screens */}
+                <div className="inline-flex p-1 bg-stone-100 border border-stone-200 rounded-xl shrink-0">
+                  <button
+                    type="button"
+                    id="view-toggle-generic-contract-btn"
+                    onClick={() => setMarketAnalyzerNflMode(false)}
+                    className={`inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                      !marketAnalyzerNflMode
+                        ? 'bg-white text-[#03045e] shadow-2xs border border-stone-200'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                    title="Switch to Generic Contract mode"
+                  >
+                    <FileText className="w-3.5 h-3.5 shrink-0" />
+                    <span className="hidden sm:inline">Generic Contract</span>
+                    <span className="sm:hidden">Generic</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="view-toggle-nfl-football-btn"
+                    onClick={() => setMarketAnalyzerNflMode(true)}
+                    className={`inline-flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                      marketAnalyzerNflMode
+                        ? 'bg-[#03045e] text-white shadow-2xs'
+                        : 'text-stone-600 hover:text-stone-900'
+                    }`}
+                    title="Switch to NFL Football mode"
+                  >
+                    <Trophy className="w-3.5 h-3.5 text-[#90e0ef] shrink-0" />
+                    <span className="hidden sm:inline">NFL Football</span>
+                    <span className="sm:hidden">NFL</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Market Analyzer Sub-Navigation Bar */}
+            <div
+              id="market-analyzer-sub-nav"
+              className="flex items-center space-x-2 border-b border-stone-200 pb-3"
+            >
+              <button
+                type="button"
+                id="market-analyzer-subnav-analysis-tab"
+                onClick={() => setMarketAnalyzerSubTab('analysis')}
+                className={`inline-flex items-center space-x-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  marketAnalyzerSubTab === 'analysis'
+                    ? 'bg-[#03045e] text-white shadow-2xs'
+                    : 'bg-white text-stone-600 hover:text-[#03045e] hover:bg-stone-100 border border-stone-200'
+                }`}
+              >
+                <TrendingUp className="w-4 h-4" />
+                <span>Contract Analysis</span>
+              </button>
+
+              <button
+                type="button"
+                id="market-analyzer-subnav-nfl-schedule-tab"
+                onClick={() => setMarketAnalyzerSubTab('nfl_schedule')}
+                className={`inline-flex items-center space-x-2 px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                  marketAnalyzerSubTab === 'nfl_schedule'
+                    ? 'bg-[#03045e] text-white shadow-2xs'
+                    : 'bg-white text-stone-600 hover:text-[#03045e] hover:bg-stone-100 border border-stone-200'
+                }`}
+              >
+                <Calendar className="w-4 h-4 text-[#00b4d8]" />
+                <span>NFL Schedule</span>
+                <span
+                  className={`px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-wider ${
+                    marketAnalyzerSubTab === 'nfl_schedule'
+                      ? 'bg-[#00d4ff] text-[#03045e]'
+                      : 'bg-stone-200 text-stone-700'
+                  }`}
+                >
+                  Weekly Slate
+                </span>
+              </button>
+            </div>
+
+            {/* Sub-Tab 1: NFL Schedule */}
+            {marketAnalyzerSubTab === 'nfl_schedule' ? (
+              <NflScheduleTab
+                onAnalyzeGame={(matchupQuery) => {
+                  setMarketAnalyzerSubTab('analysis');
+                  setMarketAnalyzerNflMode(true);
+                  handleAnalyze(matchupQuery, 50, 'Culture & Sports');
+                }}
+                onNavigateToPlayerProps={(matchupQuery) => {
+                  if (matchupQuery) {
+                    setSelectedPlayerPropsMatchup(matchupQuery);
+                    handleFetchPlayerProps(matchupQuery);
+                  }
+                  setActiveView('player_props');
+                }}
+              />
+            ) : (
+              /* Sub-Tab 2: Standard Contract Analysis Pipeline */
+              <>
+                {/* Research Pipeline Search Bar */}
+                <SearchPipelineInput isLoading={isLoading} onAnalyze={handleAnalyze} />
+
+                {/* Pipeline In-Progress Animation */}
+                <PipelineProgress isLoading={isLoading} />
+
+                {/* Error notification if any */}
+                {error && (
+                  <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center space-x-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {/* Analysis Results Display */}
+                {activeAnalysis && !isLoading && (
+                  <div className="space-y-6">
+                    {/* 1. Primary Odds Matrix & Edge Overview */}
+                    <OddsOverviewCard
+                      analysis={activeAnalysis}
+                      onTradeClick={handleTradeClick}
+                      onOpenEli6={() => setIsEli6Open(true)}
+                      volatilitySummary={currentVolatilitySummary}
+                      volatilityChecks={currentEventChecks}
+                      onExportData={handleExportAnalysisData}
+                      isNflMode={marketAnalyzerNflMode}
+                      onToggleNflMode={setMarketAnalyzerNflMode}
+                    />
+
+                    {/* 2. Market Price Volatility Tracker (Last 3 Consecutive Checks Comparison) */}
+                    <MarketPriceVolatilityCard
+                      eventTitle={activeAnalysis.eventTitle}
+                      currentMarketPrice={activeAnalysis.marketEconomics.marketPriceCents}
+                      checks={currentEventChecks}
+                      priceChecksMap={priceChecksMap}
+                      onAddPriceCheck={handleRecordPriceCheck}
+                      isLoadingCheck={isPriceCheckLoading}
+                    />
+
+                    {/* 3. Market Sentiment Trend Tracker (7-Day News & Social Media Aggregate) */}
+                    <MarketSentimentTrend
+                      eventTitle={activeAnalysis.eventTitle}
+                      category={activeAnalysis.category}
+                      currentMarketPriceCents={activeAnalysis.marketEconomics.marketPriceCents}
+                    />
+
+                    {/* 4. Financial Analysis: Expected Value, Fees, Kelly Sizing & Risk Attribution */}
+                    <ProbabilityCalculator
+                      marketEconomics={activeAnalysis.marketEconomics}
+                      probabilities={activeAnalysis.probabilities}
+                      analysis={activeAnalysis}
+                    />
+
+                    {/* 5. Historical Backtest Performance (Last 30 Days for Selected Category) */}
+                    <HistoricalBacktestPerformance
+                      analysis={activeAnalysis}
+                      category={activeAnalysis.category}
+                    />
+
+                    {/* 6. Multi-Agent Dialectic Debate Arena */}
+                    <DebateArena
+                      bullAgent={activeAnalysis.bullAgent}
+                      bearAgent={activeAnalysis.bearAgent}
+                      synthesis={activeAnalysis.synthesis}
+                    />
+
+                    {/* 4. Contract Resolution Rulebook & Ambiguity Traps */}
+                    <ResolutionCriteriaCard criteria={activeAnalysis.resolutionCriteria} />
+
+                    {/* 5. Key Timeline Catalysts */}
+                    <CatalystsTimeline catalysts={activeAnalysis.catalysts} />
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
 
-        {/* VIEW 3: ENTERPRISE WEBHOOK & ERP CONNECTOR STUDIO */}
+        {/* VIEW 3: COMPREHENSIVE NFL MODELS & ANALYTICS HUB */}
+        {activeView === 'player_props' && (
+          <NflHubView
+            playerPropsData={playerPropsData}
+            isLoadingProps={isPlayerPropsLoading}
+            onRefreshProps={() => handleFetchPlayerProps(selectedPlayerPropsMatchup)}
+            selectedMatchup={selectedPlayerPropsMatchup}
+            onSelectMatchup={(m) => {
+              setSelectedPlayerPropsMatchup(m);
+              handleFetchPlayerProps(m);
+            }}
+          />
+        )}
+
+        {/* VIEW 4: ENTERPRISE WEBHOOK & ERP CONNECTOR STUDIO */}
         {activeView === 'erp_connector' && (
           <EnterpriseWebhookStudio
             activeAnalysis={activeAnalysis}
@@ -1256,6 +1863,16 @@ export default function App() {
           onAuthenticate={(session) => setUserSession(session)}
         />
       )}
+
+      {/* NFL Live Player Props & Yardage Projections Modal */}
+      <PlayerPropsModal
+        isOpen={isPlayerPropsModalOpen}
+        onClose={() => setIsPlayerPropsModalOpen(false)}
+        data={playerPropsData}
+        isLoading={isPlayerPropsLoading}
+        onRefresh={handleFetchPlayerProps}
+        onPlacePaperBet={handlePlacePlayerPropBet}
+      />
     </div>
   );
 }

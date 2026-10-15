@@ -2,12 +2,13 @@ import React from 'react';
 import { Menu, ShieldCheck, LogOut, User, Sun, Moon } from 'lucide-react';
 import { CloudboyXLogo } from './CloudboyXLogo';
 import { UserSession } from './AccessGateModal';
+import { ActiveWorkspaceView } from '../types';
 
 export interface HeaderProps {
   onToggleSidebar?: () => void;
   onOpenSuiteSwitcher?: () => void;
-  activeView?: 'model_studio' | 'market_analyzer' | 'erp_connector';
-  onSelectView?: (view: 'model_studio' | 'market_analyzer' | 'erp_connector') => void;
+  activeView?: ActiveWorkspaceView;
+  onSelectView?: (view: ActiveWorkspaceView) => void;
   bankroll?: number;
   openPositionsCount?: number;
   onOpenPortfolio?: () => void;
