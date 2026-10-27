@@ -206,14 +206,14 @@ const SECTION_GUIDES: SectionGuide[] = [
     subtitle: 'High-Resolution Print & Offline Documentation',
     icon: Printer,
     view: 'market_analyzer',
-    domId: 'header-training-docs-btn',
+    domId: 'universal-hamburger-menu-btn',
     whatItDoes: 'Generates professional, publication-quality PDF documentation covering standard operating procedures, technical architecture, and mathematical risk principles.',
     keyMetrics: [
       'Complete Operator Master Suite (25+ pages).',
       'Quick Reference Trading & Volatility Cheatsheet.',
       'Technical Systems & Webhook Integration Manual.',
     ],
-    proTip: 'Click the PDF printer icon in the PredictaBot header to download the complete training manual instantly!',
+    proTip: 'Open the hamburger menu (☰) to access the complete Training Center, Operator Manual & PDF download!',
   },
   {
     id: 'kalshi-calculator',

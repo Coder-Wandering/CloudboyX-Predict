@@ -51,9 +51,9 @@ if os.path.exists(ENV_PATH):
     except Exception:
         pass
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-NEWS_API_KEY = os.environ.get("NEWS_API_KEY", "")
-ALPHA_VANTAGE_KEY = os.environ.get("ALPHA_VANTAGE_KEY", "")
+GEMINI_API_KEY = (os.environ.get("GEMINI_API_KEY", "") or os.environ.get("API_KEY", "") or os.environ.get("GOOGLE_GENAI_API_KEY", "")).strip().strip('"').strip("'")
+NEWS_API_KEY = os.environ.get("NEWS_API_KEY", "").strip().strip('"').strip("'")
+ALPHA_VANTAGE_KEY = os.environ.get("ALPHA_VANTAGE_KEY", "").strip().strip('"').strip("'")
 
 # -----------------------------------------------------------------------------
 # SQLite Database Setup

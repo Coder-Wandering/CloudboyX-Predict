@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   ProbabilityAnalysisResult,
   PaperTradePosition,
@@ -32,6 +32,7 @@ import { WalkthroughBot } from './components/WalkthroughBot';
 import { CloudboyXSuiteModal } from './components/CloudboyXSuiteModal';
 import { EnterpriseWebhookStudio } from './components/EnterpriseWebhookStudio';
 import { ShareModal } from './components/ShareModal';
+import { LandingPage } from './components/LandingPage';
 import { PRESET_EVENTS } from './data/presetEvents';
 import {
   AlertCircle,
@@ -56,6 +57,10 @@ import {
   Zap,
   Activity,
   AlertTriangle,
+  Bell,
+  BellRing,
+  BellOff,
+  Volume2,
 } from 'lucide-react';
 import { exportAnalysisAsJson } from './utils/exportUtils';
 import { AccessGateModal, UserSession } from './components/AccessGateModal';
@@ -117,6 +122,51 @@ export default function App() {
 
   const handleToggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
+
+  // Marketing Landing Page vs Enterprise Module state
+  const [isLandingPage, setIsLandingPage] = useState<boolean>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'enterprise') return false;
+      if (params.get('view') === 'landing') return true;
+      const saved = localStorage.getItem('cloudboyx_view_mode');
+      if (saved === 'enterprise') return false;
+      return true; // Default to Landing Page so users immediately see the marketing presentation
+    } catch {
+      return true;
+    }
+  });
+
+  const handleLaunchEnterprise = (targetView?: ActiveWorkspaceView) => {
+    setIsLandingPage(false);
+    if (targetView) {
+      setActiveView(targetView);
+    }
+    if (!userSession) {
+      const defaultSession: UserSession = {
+        username: 'Enterprise Desk',
+        role: 'Institutional Analyst',
+        accessKey: 'PREDICT-ENTERPRISE-PASS',
+        authenticatedAt: new Date().toISOString(),
+      };
+      try {
+        localStorage.setItem('cloudboy_user_session', JSON.stringify(defaultSession));
+      } catch {}
+      setUserSession(defaultSession);
+    }
+    try {
+      localStorage.setItem('cloudboyx_view_mode', 'enterprise');
+    } catch {}
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenLandingPage = () => {
+    setIsLandingPage(true);
+    try {
+      localStorage.setItem('cloudboyx_view_mode', 'landing');
+    } catch {}
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const [activeView, setActiveView] = useState<ActiveWorkspaceView>('model_studio');
@@ -191,6 +241,27 @@ export default function App() {
   const toastRemainingMsRef = useRef<number>(0);
   const [isGlobalShareOpen, setIsGlobalShareOpen] = useState<boolean>(false);
   const [isSimulatedSpikeActive, setIsSimulatedSpikeActive] = useState<boolean>(false);
+
+  // Mode Bar Custom Price Alert states (saved threshold retained even when toggled off)
+  const [modeBarAlertThreshold, setModeBarAlertThreshold] = useState<string>(() => {
+    try {
+      return localStorage.getItem('cloudboyx_modebar_alert_threshold') || '55';
+    } catch {
+      return '55';
+    }
+  });
+  const [isModeBarAlertEnabled, setIsModeBarAlertEnabled] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('cloudboyx_modebar_alert_enabled');
+      return saved !== null ? saved === 'true' : true;
+    } catch {
+      return true;
+    }
+  });
+  const [isPriceAlertHighlightActive, setIsPriceAlertHighlightActive] = useState<boolean>(false);
+  const [, setLastTriggeredAlertPrice] = useState<number | null>(null);
+  const lastAlertEvaluatedPriceRef = useRef<number | null>(null);
+  const alertHighlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Handle export analysis object as JSON file
   const handleExportAnalysisData = () => {
@@ -918,6 +989,116 @@ export default function App() {
     handleRecordPriceCheck(targetPrice, 'Tick Update');
   };
 
+  // Web Audio API harmonic chime for Price Alerts
+  const playPriceAlertNotificationSound = useCallback(() => {
+    try {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+      const now = ctx.currentTime;
+
+      // Harmonic bell chime 1 (F#5 - 739.99 Hz)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(739.99, now);
+      gain1.gain.setValueAtTime(0.2, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.35);
+
+      // Harmonic bell chime 2 (C#6 - 1108.73 Hz)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1108.73, now + 0.12);
+      gain2.gain.setValueAtTime(0.25, now + 0.12);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now + 0.12);
+      osc2.stop(now + 0.65);
+    } catch (err) {
+      console.warn('Price alert chime sound error:', err);
+    }
+  }, []);
+
+  // Trigger alert highlight animation and audio chime
+  const triggerPriceAlert = useCallback(
+    (currentPrice: number) => {
+      setLastTriggeredAlertPrice(currentPrice);
+      setIsPriceAlertHighlightActive(true);
+      playPriceAlertNotificationSound();
+
+      if (alertHighlightTimeoutRef.current) {
+        clearTimeout(alertHighlightTimeoutRef.current);
+      }
+      alertHighlightTimeoutRef.current = setTimeout(() => {
+        setIsPriceAlertHighlightActive(false);
+      }, 4500);
+    },
+    [playPriceAlertNotificationSound]
+  );
+
+  // Monitor live market price crossing the custom threshold
+  useEffect(() => {
+    const currentPrice =
+      currentEventChecks && currentEventChecks.length > 0
+        ? currentEventChecks[currentEventChecks.length - 1].priceCents
+        : (activeAnalysis?.marketEconomics.marketPriceCents ?? null);
+
+    if (currentPrice === null) return;
+
+    const prevPrice = lastAlertEvaluatedPriceRef.current;
+    lastAlertEvaluatedPriceRef.current = currentPrice;
+
+    // Only trigger if alerts are enabled by the toggle switch and a valid threshold exists
+    if (!isModeBarAlertEnabled) return;
+    const threshold = parseFloat(modeBarAlertThreshold);
+    if (isNaN(threshold) || threshold <= 0) return;
+
+    if (prevPrice !== null && prevPrice !== currentPrice) {
+      const crossed =
+        (prevPrice < threshold && currentPrice >= threshold) ||
+        (prevPrice > threshold && currentPrice <= threshold) ||
+        currentPrice === threshold;
+
+      if (crossed) {
+        triggerPriceAlert(currentPrice);
+      }
+    }
+  }, [
+    currentEventChecks,
+    activeAnalysis?.marketEconomics.marketPriceCents,
+    isModeBarAlertEnabled,
+    modeBarAlertThreshold,
+    triggerPriceAlert,
+  ]);
+
+  // Test button handler to verify notification sound and visual highlight animation
+  const handleTestPriceAlert = () => {
+    const threshold = parseFloat(modeBarAlertThreshold) || 55;
+    triggerPriceAlert(threshold);
+  };
+
+  // If Marketing Landing Page is active, render the high-converting CloudboyX Predict marketing page
+  if (isLandingPage) {
+    return (
+      <LandingPage
+        onLaunchEnterprise={handleLaunchEnterprise}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+      />
+    );
+  }
+
   return (
     <div
       className={`min-h-screen ${
@@ -948,6 +1129,7 @@ export default function App() {
         onSignOut={handleSignOut}
         theme={theme}
         onToggleTheme={handleToggleTheme}
+        onOpenLandingPage={handleOpenLandingPage}
         onResetBankroll={() => {
           setBankroll(1000.0);
           try {
@@ -1011,6 +1193,7 @@ export default function App() {
         onOpenSuiteSwitcher={() => setIsSuiteSwitcherOpen(true)}
         userSession={userSession}
         onSignOut={handleSignOut}
+        onOpenLandingPage={handleOpenLandingPage}
       />
 
       {/* Main Content Body */}
@@ -1139,6 +1322,136 @@ export default function App() {
                     <span className="text-[9px] font-mono opacity-75">
                       ({directionalTickTrend.delta > 0 ? `+${directionalTickTrend.delta}` : directionalTickTrend.delta}&cent;)
                     </span>
+                  </div>
+
+                  {/* Custom Price Alert Input Field & Enable/Disable Toggle Switch */}
+                  <div
+                    id="mode-bar-price-alert-container"
+                    data-testid="mode-bar-price-alert-container"
+                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg border text-xs transition-all shrink-0 ${
+                      isPriceAlertHighlightActive
+                        ? 'bg-amber-100/95 border-amber-500 ring-2 ring-amber-400 ring-offset-1 text-amber-950 shadow-md shadow-amber-300 animate-pulse'
+                        : isModeBarAlertEnabled
+                        ? 'bg-amber-50/80 border-amber-200 text-amber-900'
+                        : 'bg-stone-100/80 border-stone-200 text-stone-500'
+                    }`}
+                    title={
+                      isModeBarAlertEnabled
+                        ? `Custom Price Alert Active at ${modeBarAlertThreshold || '--'}¢. Plays chime & triggers visual highlight animation when live market price crosses threshold.`
+                        : `Custom Price Alert Disabled (saved threshold ${modeBarAlertThreshold || '--'}¢ retained). Click toggle to enable.`
+                    }
+                  >
+                    {/* Checkbox / Toggle switch to quickly enable or disable price alert without clearing saved threshold */}
+                    <label
+                      htmlFor="mode-bar-price-alert-toggle"
+                      id="mode-bar-price-alert-toggle-label"
+                      className="inline-flex items-center gap-1 cursor-pointer select-none group"
+                      title={
+                        isModeBarAlertEnabled
+                          ? 'Click to disable price alert (saved threshold will be preserved)'
+                          : 'Click to enable price alert with saved threshold'
+                      }
+                    >
+                      <input
+                        type="checkbox"
+                        id="mode-bar-price-alert-toggle"
+                        data-testid="mode-bar-price-alert-toggle"
+                        checked={isModeBarAlertEnabled}
+                        onChange={(e) => {
+                          const nextVal = e.target.checked;
+                          setIsModeBarAlertEnabled(nextVal);
+                          try {
+                            localStorage.setItem('cloudboyx_modebar_alert_enabled', String(nextVal));
+                          } catch {}
+                        }}
+                        className="sr-only"
+                      />
+                      {/* Visual toggle switch slider */}
+                      <span
+                        className={`w-6 h-3.5 rounded-full transition-colors duration-200 ease-in-out p-0.5 flex items-center ${
+                          isModeBarAlertEnabled ? 'bg-amber-500' : 'bg-stone-300 group-hover:bg-stone-400'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full bg-white shadow-2xs transform transition-transform duration-200 ease-in-out ${
+                            isModeBarAlertEnabled ? 'translate-x-2.5' : 'translate-x-0'
+                          }`}
+                        />
+                      </span>
+
+                      {isModeBarAlertEnabled ? (
+                        <Bell className={`w-3 h-3 text-amber-600 shrink-0 ${isPriceAlertHighlightActive ? 'animate-bounce' : ''}`} />
+                      ) : (
+                        <BellOff className="w-3 h-3 text-stone-400 shrink-0" />
+                      )}
+                      <span className="text-[10px] font-bold tracking-tight">
+                        {isModeBarAlertEnabled ? 'Alert' : 'Off'}
+                      </span>
+                    </label>
+
+                    {/* Price Alert Custom Threshold Input Field */}
+                    <div className="inline-flex items-center gap-0.5">
+                      <span className="text-[10px] font-mono text-stone-400">&ge;</span>
+                      <input
+                        type="number"
+                        id="mode-bar-price-alert-input"
+                        data-testid="mode-bar-price-alert-input"
+                        min={1}
+                        max={99}
+                        value={modeBarAlertThreshold}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setModeBarAlertThreshold(val);
+                          try {
+                            localStorage.setItem('cloudboyx_modebar_alert_threshold', val);
+                          } catch {}
+                        }}
+                        placeholder="55"
+                        className={`w-9 h-5 px-1 text-[11px] font-mono font-bold text-center rounded border transition-all ${
+                          isModeBarAlertEnabled
+                            ? 'bg-white text-stone-900 border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-500'
+                            : 'bg-stone-100 text-stone-500 border-stone-200 cursor-default'
+                        }`}
+                        title={
+                          isModeBarAlertEnabled
+                            ? `Custom price alert threshold in cents (currently ${modeBarAlertThreshold}¢)`
+                            : `Saved threshold is ${modeBarAlertThreshold}¢ (Alert currently disabled via toggle)`
+                        }
+                      />
+                      <span className={`text-[10.5px] font-mono font-bold ${isModeBarAlertEnabled ? 'text-amber-800' : 'text-stone-400'}`}>
+                        &cent;
+                      </span>
+                    </div>
+
+                    {/* Triggered Badge Animation */}
+                    {isPriceAlertHighlightActive && (
+                      <span
+                        id="mode-bar-price-alert-triggered-badge"
+                        className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-amber-600 text-white text-[9.5px] font-extrabold animate-pulse whitespace-nowrap shadow-xs"
+                        title="Alert threshold crossed! Browser notification sound played."
+                      >
+                        <BellRing className="w-2.5 h-2.5 animate-spin" />
+                        <span>Triggered!</span>
+                        <Volume2 className="w-2.5 h-2.5" />
+                      </span>
+                    )}
+
+                    {/* Test Alert Button */}
+                    <button
+                      type="button"
+                      id="mode-bar-test-price-alert-btn"
+                      onClick={handleTestPriceAlert}
+                      className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold border transition-all cursor-pointer whitespace-nowrap flex items-center gap-0.5 ${
+                        isPriceAlertHighlightActive
+                          ? 'bg-amber-600 text-white border-amber-700'
+                          : 'bg-white hover:bg-amber-100 text-amber-800 border-amber-200 hover:border-amber-300'
+                      }`}
+                      title="Test browser notification sound and visual highlight animation"
+                    >
+                      <Volume2 className="w-2.5 h-2.5" />
+                      <span>Test</span>
+                    </button>
                   </div>
                 </div>
 

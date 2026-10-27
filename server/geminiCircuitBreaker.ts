@@ -69,8 +69,18 @@ export function getCleanDiagnosticNotice(err: any): string {
   return 'Service Notice';
 }
 
+export function getGeminiApiKey(): string {
+  const rawKey =
+    process.env.GEMINI_API_KEY ||
+    process.env.API_KEY ||
+    process.env.GOOGLE_GENAI_API_KEY ||
+    process.env.GOOGLE_API_KEY ||
+    '';
+  return rawKey.trim().replace(/^["']|["']$/g, '');
+}
+
 export function getGeminiClient(): GoogleGenAI | null {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = getGeminiApiKey();
   if (!apiKey) return null;
   if (isGeminiQuotaExhausted()) {
     return null; // Seamlessly bypass calling external API while in quota cooldown

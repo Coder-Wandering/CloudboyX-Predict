@@ -14,6 +14,7 @@ import {
   recordGeminiFailure,
   recordGeminiSuccess,
   getCleanDiagnosticNotice,
+  getGeminiApiKey,
 } from './server/geminiCircuitBreaker';
 import { runHistoricalBacktest } from './src/utils/backtestEngine';
 import { MarketCategory } from './src/types';
@@ -21,7 +22,21 @@ import { MarketCategory } from './src/types';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+// Enable CORS for cross-domain and decoupled deployments
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-CloudboyX-Signature, X-CloudboyX-Timestamp'
+  );
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -95,7 +110,9 @@ async function generateGeminiContentWithFallback(
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    hasApiKey: Boolean(process.env.GEMINI_API_KEY),
+    hasApiKey: Boolean(getGeminiApiKey()),
+    port: PORT,
+    nodeEnv: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString(),
   });
 });
@@ -3214,15 +3231,24 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    const candidatePaths = [
+      path.join(process.cwd(), 'dist'),
+      path.join(__dirname),
+      path.join(__dirname, '..', 'dist'),
+    ];
+    const distPath = candidatePaths.find((p) => fs.existsSync(path.join(p, 'index.html'))) || candidatePaths[0];
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: `API route ${req.path} not found` });
+      }
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Prediction Market Odds Server running on http://0.0.0.0:${PORT}`);
+    console.log(`CloudboyX Server running on http://0.0.0.0:${PORT} [mode: ${process.env.NODE_ENV || 'development'}]`);
+    console.log(`AI Generative Inference: ${getGeminiApiKey() ? 'API Key Configured' : 'Calibrated Standalone Baseline Mode'}`);
   });
 }
 

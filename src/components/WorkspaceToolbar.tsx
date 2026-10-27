@@ -1,8 +1,6 @@
 import React from 'react';
 import {
   Briefcase,
-  BookOpen,
-  Printer,
   Download,
   BarChart3,
   TrendingUp,
@@ -20,7 +18,7 @@ interface WorkspaceToolbarProps {
   bankroll: number;
   openPositionsCount: number;
   onOpenPortfolio: () => void;
-  onOpenTrainingDocs: () => void;
+  onOpenTrainingDocs?: () => void;
   hasActiveAnalysis?: boolean;
   onExportAnalysisData?: () => void;
   onShareAnalysis?: () => void;
@@ -134,30 +132,7 @@ export const WorkspaceToolbar: React.FC<WorkspaceToolbarProps> = ({
           </button>
         )}
 
-        {/* Instruction & Training Docs Button */}
-        <button
-          id="toolbar-training-docs-btn"
-          onClick={onOpenTrainingDocs}
-          className="inline-flex items-center space-x-1 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-stone-100 hover:bg-[#caf0f8]/50 text-stone-700 hover:text-[#03045e] border border-stone-200 hover:border-[#90e0ef] transition-colors cursor-pointer shrink-0"
-          title="Open instruction and training documentation"
-        >
-          <BookOpen className="w-3.5 h-3.5 text-[#0077b6]" />
-          <span className="hidden sm:inline">Docs &amp; Training</span>
-          <span className="inline sm:hidden">Docs</span>
-        </button>
 
-        {/* Direct PDF Download Link */}
-        <a
-          id="toolbar-pdf-download-btn"
-          href="/api/docs/pdf/all"
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex items-center space-x-1 px-2 py-1.5 rounded-xl text-xs font-bold bg-stone-100 hover:bg-[#caf0f8]/50 text-stone-700 hover:text-[#0077b6] border border-stone-200 hover:border-[#90e0ef] transition-colors cursor-pointer shrink-0"
-          title="Download complete instruction manual as PDF"
-        >
-          <Printer className="w-3.5 h-3.5 text-[#0077b6]" />
-          <span>PDF</span>
-        </a>
 
         {/* Export Current Analysis Data JSON */}
         {hasActiveAnalysis && onExportAnalysisData && (

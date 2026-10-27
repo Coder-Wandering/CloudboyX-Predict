@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, ShieldCheck, LogOut, User, Sun, Moon } from 'lucide-react';
+import { Menu, ShieldCheck, LogOut, User, Sun, Moon, Globe } from 'lucide-react';
 import { CloudboyXLogo } from './CloudboyXLogo';
 import { UserSession } from './AccessGateModal';
 import { ActiveWorkspaceView } from '../types';
@@ -26,6 +26,7 @@ export interface HeaderProps {
   onSignOut?: () => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
+  onOpenLandingPage?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -34,11 +35,12 @@ export const Header: React.FC<HeaderProps> = ({
   onSignOut,
   theme = 'light',
   onToggleTheme,
+  onOpenLandingPage,
 }) => {
   return (
     <header
       id="main-app-header"
-      className="border-b border-stone-200 bg-white/95 sticky top-0 z-30 backdrop-blur-md shadow-xs select-none transition-colors duration-200"
+      className="border-b border-stone-200 dark:border-slate-800 bg-white/95 dark:bg-[#080d1a]/95 sticky top-0 z-30 backdrop-blur-md shadow-xs select-none transition-colors duration-200"
     >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 md:h-18 flex items-center justify-between">
         {/* Three lines for universal menu + Cloudboy Predict */}
@@ -47,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             id="universal-hamburger-menu-btn"
             onClick={onToggleSidebar}
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-[#03045e] hover:text-[#0077b6] hover:bg-[#caf0f8]/50 active:bg-[#90e0ef]/40 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0077b6] cursor-pointer flex items-center justify-center group shrink-0"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-[#03045e] dark:text-[#90e0ef] hover:text-[#0077b6] dark:hover:text-white hover:bg-[#caf0f8]/50 dark:hover:bg-slate-800/80 active:bg-[#90e0ef]/40 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0077b6] cursor-pointer flex items-center justify-center group shrink-0"
             aria-label="Open universal navigation menu"
             title="Open universal navigation menu"
           >
@@ -71,8 +73,8 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Cloudboy Predict"
           >
             <CloudboyXLogo
-              size={32}
-              variant="badge"
+              size={38}
+              variant={theme === 'dark' ? 'white' : 'badge'}
               includePredict={true}
               className="transition-transform group-hover:scale-[1.01]"
             />
@@ -112,6 +114,20 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
           </button>
+
+          {/* Quick Return / View Landing Page Button */}
+          {onOpenLandingPage && (
+            <button
+              type="button"
+              id="header-landing-page-btn"
+              onClick={onOpenLandingPage}
+              className="inline-flex items-center space-x-1.5 h-8 sm:h-9 px-2.5 sm:px-3 rounded-full border border-stone-200 dark:border-slate-700 bg-stone-100 dark:bg-slate-800/90 hover:bg-[#caf0f8]/60 dark:hover:bg-slate-700 text-[#0077b6] dark:text-[#38bdf8] text-xs font-bold transition-all cursor-pointer shadow-2xs select-none active:scale-95"
+              title="View CloudboyX Predict Marketing Landing Page"
+            >
+              <Globe className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden sm:inline">Landing Page</span>
+            </button>
+          )}
 
           {userSession && (
             <div className="flex items-center space-x-1.5 sm:space-x-2">

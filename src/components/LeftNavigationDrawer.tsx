@@ -21,6 +21,7 @@ import {
   LogOut,
   User,
   Trophy,
+  Globe,
 } from 'lucide-react';
 import { ProbabilityAnalysisResult, ActiveWorkspaceView } from '../types';
 import { CloudboyXLogo } from './CloudboyXLogo';
@@ -44,6 +45,7 @@ interface LeftNavigationDrawerProps {
   onOpenSuiteSwitcher?: () => void;
   userSession?: UserSession | null;
   onSignOut?: () => void;
+  onOpenLandingPage?: () => void;
 }
 
 export const LeftNavigationDrawer: React.FC<LeftNavigationDrawerProps> = ({
@@ -64,6 +66,7 @@ export const LeftNavigationDrawer: React.FC<LeftNavigationDrawerProps> = ({
   onOpenSuiteSwitcher,
   userSession,
   onSignOut,
+  onOpenLandingPage,
 }) => {
   // Close on Escape key
   useEffect(() => {
@@ -151,6 +154,76 @@ export const LeftNavigationDrawer: React.FC<LeftNavigationDrawerProps> = ({
                 </button>
               )}
             </div>
+          )}
+
+          {/* Quick Access: Documentation & PDF Manual Banner */}
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#caf0f8]/60 hover:bg-[#caf0f8] border border-[#90e0ef] transition-colors shadow-2xs">
+            <button
+              type="button"
+              id="drawer-top-docs-btn"
+              onClick={() => {
+                onOpenTrainingDocs();
+                onClose();
+              }}
+              className="flex items-center space-x-2.5 text-xs font-bold text-[#03045e] hover:text-[#0077b6] cursor-pointer flex-1 text-left min-w-0"
+              title="Open documentation and operator training guide"
+            >
+              <div className="w-7 h-7 rounded-lg bg-[#0077b6] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <BookOpen className="w-3.5 h-3.5" />
+              </div>
+              <div className="truncate">
+                <div className="flex items-center space-x-1.5 leading-tight">
+                  <span className="truncate">Docs &amp; Training</span>
+                  <span className="px-1.5 py-0.2 rounded text-[8px] font-black bg-[#00b4d8] text-[#03045e] uppercase shrink-0">
+                    DOCS
+                  </span>
+                </div>
+                <div className="text-[10px] text-[#0077b6] font-normal truncate">
+                  Operator guide, formulas &amp; exam
+                </div>
+              </div>
+            </button>
+            <a
+              id="drawer-top-docs-pdf-link"
+              href="/api/docs/pdf/all"
+              target="_blank"
+              rel="noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="ml-2 px-2 py-1 rounded-md text-[10px] font-bold bg-white text-[#0077b6] border border-[#90e0ef] hover:bg-[#0077b6] hover:text-white transition-colors flex items-center space-x-1 shrink-0"
+              title="Directly download complete instruction manual as PDF"
+            >
+              <Printer className="w-3 h-3" />
+              <span>PDF</span>
+            </a>
+          </div>
+
+          {/* Quick Access: Marketing Landing Page */}
+          {onOpenLandingPage && (
+            <button
+              type="button"
+              id="drawer-nav-landing-page-btn"
+              onClick={() => {
+                onOpenLandingPage();
+                onClose();
+              }}
+              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-slate-100 border border-stone-200 text-[#03045e] transition-colors shadow-2xs group cursor-pointer text-left"
+              title="View the CloudboyX Predict marketing landing page"
+            >
+              <div className="flex items-center space-x-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-[#03045e] text-white flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-105 transition-transform">
+                  <Globe className="w-3.5 h-3.5 text-[#00d4ff]" />
+                </div>
+                <div className="truncate">
+                  <div className="flex items-center space-x-1.5 leading-tight">
+                    <span className="text-xs font-bold truncate">Marketing Landing Page</span>
+                  </div>
+                  <div className="text-[10px] text-stone-500 font-normal truncate">
+                    Platform overview, features &amp; pricing
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-stone-400 group-hover:text-[#0077b6] group-hover:translate-x-0.5 transition-all shrink-0" />
+            </button>
           )}
 
           {/* CloudboyX Unified Enterprise Suite Switcher Block */}
